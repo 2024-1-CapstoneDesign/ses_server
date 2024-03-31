@@ -1,4 +1,4 @@
-package capstone.ses.domain;
+package capstone.ses.domain.soundeffect;
 
 import capstone.ses.domain.system.BaseEntity;
 import jakarta.persistence.*;
