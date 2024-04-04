@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.sql.Blob;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -25,7 +26,8 @@ public class SoundEffectType extends BaseEntity {
 
     private String soundEffectTypeName;
     private Integer length;
-    private String url;
+    @Lob
+    private Blob soundEffectFile;
     private BigDecimal sampleRate;
     private Integer bitDepth;
     private String channels;
