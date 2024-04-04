@@ -10,7 +10,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SoundEffect_SoundEffectTag_Rel {
+public class SoundEffectSoundEffectTagRel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sound_effect_sound_effect_tag_rel_id")
