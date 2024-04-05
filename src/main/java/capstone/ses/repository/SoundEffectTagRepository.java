@@ -1,5 +1,6 @@
 package capstone.ses.repository;
 
+import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffectTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 

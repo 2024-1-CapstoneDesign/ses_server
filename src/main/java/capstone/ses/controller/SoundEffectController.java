@@ -4,6 +4,7 @@ import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
 import capstone.ses.repository.SoundEffectTypeRepository;
+import capstone.ses.service.SoundEffectService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.Base64;
 @RequestMapping("/api/v1")
 public class SoundEffectController {
 
+    private final SoundEffectService soundEffectService;
     private final SoundEffectTypeRepository soundEffectTypeRepository;
 
     @PostMapping("/test")
@@ -80,10 +82,14 @@ public class SoundEffectController {
         }
     }
 
-//    @GetMapping("soundeffect/{soundEffectId}")
-//    public Result searchSoundEffect(@PathVariable Long soundEffectId) {
-//        try {
-//
-//        }
-//    }
+    @GetMapping("soundeffect/{soundEffectId}")
+    public Result searchSoundEffect(@PathVariable Long soundEffectId) {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchSoundEffect(soundEffectId));
+        } catch (EntityNotFoundException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "300");
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
 }
