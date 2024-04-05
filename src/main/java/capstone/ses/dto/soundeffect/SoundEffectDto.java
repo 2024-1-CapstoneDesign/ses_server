@@ -5,20 +5,34 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-@Builder
 public class SoundEffectDto {
     private Long soundEffectId;
     private String soundEffectName;
     private String description;
     private String createBy;
     private LocalDateTime createdAt;
-    private String url;
-    private String soundEffectTypeName;
     private List<SoundEffectTagDto> soundEffectTags;
     private List<SoundEffectTypeDto> soundEffectTypes;
+
+    @Builder
+    public SoundEffectDto(
+            Long soundEffectId,
+            String soundEffectName,
+            String description,
+            String createBy,
+            LocalDateTime createdAt,
+            List<SoundEffectTagDto> soundEffectTags,
+            List<SoundEffectTypeDto> soundEffectTypes) {
+        this.soundEffectId = soundEffectId;
+        this.soundEffectName = soundEffectName;
+        this.description = description;
+        this.createBy = createBy;
+        this.createdAt = createdAt;
+        this.soundEffectTags = soundEffectTags;
+        this.soundEffectTypes = soundEffectTypes;
+    }
 }
