@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,8 +16,6 @@ public class SoundEffectDto {
     private String description;
     private String createBy;
     private LocalDateTime createdAt;
-    private String url;
-    private String soundEffectTypeName;
     private List<SoundEffectTagDto> soundEffectTags;
     private List<SoundEffectTypeDto> soundEffectTypes;
 }
