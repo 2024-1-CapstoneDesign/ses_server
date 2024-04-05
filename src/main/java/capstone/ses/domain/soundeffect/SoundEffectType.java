@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
 
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
@@ -20,15 +20,21 @@ public class SoundEffectType extends BaseEntity {
     @Column(name = "sound_effect_type_id")
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "sound_effect_id")
     private SoundEffect soundEffect;
 
     private String soundEffectTypeName;
     private Integer length;
     @Lob
-    private Blob soundEffectFile;
+    @Column(name = "soundEffectFile", columnDefinition = "MEDIUMBLOB")
+    private byte[] soundEffectFile;
+
     private BigDecimal sampleRate;
     private Integer bitDepth;
     private String channels;
+
+    public void updateSoundEffectFile(byte[] soundEffectFile) {
+        this.soundEffectFile = soundEffectFile;
+    }
 }
