@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -42,6 +39,12 @@ public class SoundEffectController {
         } catch (IOException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
+    }
+
+    @GetMapping("/test/download")
+    public Result testDownloadByS3() {
+        SoundEffectType testData = soundEffectTypeRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("해당 효과음이 존재하지 않습니다"));
+        return new Result(ResultCode.SUCCESS, testData.getUrl());
     }
 
     @GetMapping("/test")
@@ -76,4 +79,11 @@ public class SoundEffectController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+//    @GetMapping("soundeffect/{soundEffectId}")
+//    public Result searchSoundEffect(@PathVariable Long soundEffectId) {
+//        try {
+//
+//        }
+//    }
 }
