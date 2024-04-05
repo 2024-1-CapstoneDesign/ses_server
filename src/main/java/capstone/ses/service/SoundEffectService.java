@@ -4,6 +4,7 @@ import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
 import capstone.ses.domain.soundeffect.SoundEffectTag;
 import capstone.ses.domain.soundeffect.SoundEffectType;
+import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
 import capstone.ses.dto.soundeffect.SoundEffectTagDto;
 import capstone.ses.dto.soundeffect.SoundEffectTypeDto;
@@ -52,5 +53,33 @@ public class SoundEffectService {
                 .soundEffectTags(soundEffectTagDtos)
                 .soundEffectTypes(soundEffectTypeDtos)
                 .build();
+    }
+
+    public List<SoundEffectDto> searchSoundEffects(SoundEffectCondition soundEffectCondition) {
+
+        List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
+
+        for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition)) {
+            List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
+
+            for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
+            }
+
+            List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
+
+            for (SoundEffectType soundEffectType : soundEffectTypeRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
+            }
+
+            soundEffectDtos.add(SoundEffectDto.builder()
+                    .soundEffectId(soundEffect.getId())
+                    .soundEffectName(soundEffect.getName())
+                    .soundEffectTags(soundEffectTagDtos)
+                    .soundEffectTypes(soundEffectTypeDtos)
+                    .build());
+        }
+
+        return soundEffectDtos;
     }
 }

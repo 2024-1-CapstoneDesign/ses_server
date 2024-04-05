@@ -1,22 +1,32 @@
 package capstone.ses.controller;
 
 import capstone.ses.domain.soundeffect.SoundEffectType;
+import capstone.ses.dto.soundeffect.SoundEffectCondition;
+import capstone.ses.dto.soundeffect.SoundEffectDto;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
+import capstone.ses.dto.system.Error;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import capstone.ses.service.SoundEffectService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -43,12 +53,14 @@ public class SoundEffectController {
         }
     }
 
+    //TEST-002
     @GetMapping("/test/download")
     public Result testDownloadByS3() {
         SoundEffectType testData = soundEffectTypeRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("해당 효과음이 존재하지 않습니다"));
         return new Result(ResultCode.SUCCESS, testData.getUrl());
     }
 
+    //TEST-001
     @GetMapping("/test")
     public ResponseEntity<byte[]> testSoundEffect() {
         try {
@@ -82,7 +94,37 @@ public class SoundEffectController {
         }
     }
 
-    @GetMapping("soundeffect/{soundEffectId}")
+    @GetMapping("/soundeffect")
+    public Result searchSoundEffects(@ModelAttribute @Valid SoundEffectCondition soundEffectCondition, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<Error> errors = new ArrayList<>();
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                Error error = new Error(
+                        fieldError.getField(),
+                        fieldError.getRejectedValue() == null ? "" : fieldError.getRejectedValue().toString()
+                );
+                errors.add(error);
+
+                return new Result(ResultCode.FAIL, "400", errors);
+            }
+        }
+
+        try {
+            List<SoundEffectDto> soundEffectDtos = soundEffectService.searchSoundEffects(soundEffectCondition);
+
+            if (soundEffectDtos.isEmpty()) {
+                throw new EntityNotFoundException("조건에 해당하는 효과음이 존재하지 않습니다.");
+            }
+            return new Result(ResultCode.SUCCESS, soundEffectDtos);
+        } catch (EntityNotFoundException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "300");
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-002: 효과음 세부 조회
+    @GetMapping("/soundeffect/{soundEffectId}")
     public Result searchSoundEffect(@PathVariable Long soundEffectId) {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchSoundEffect(soundEffectId));

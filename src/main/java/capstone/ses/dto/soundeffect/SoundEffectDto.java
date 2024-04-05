@@ -9,7 +9,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 public class SoundEffectDto {
     private Long soundEffectId;
     private String soundEffectName;
@@ -18,4 +17,22 @@ public class SoundEffectDto {
     private LocalDateTime createdAt;
     private List<SoundEffectTagDto> soundEffectTags;
     private List<SoundEffectTypeDto> soundEffectTypes;
+
+    @Builder
+    public SoundEffectDto(
+            Long soundEffectId,
+            String soundEffectName,
+            String description,
+            String createBy,
+            LocalDateTime createdAt,
+            List<SoundEffectTagDto> soundEffectTags,
+            List<SoundEffectTypeDto> soundEffectTypes) {
+        this.soundEffectId = soundEffectId;
+        this.soundEffectName = soundEffectName;
+        this.description = description;
+        this.createBy = createBy;
+        this.createdAt = createdAt;
+        this.soundEffectTags = soundEffectTags;
+        this.soundEffectTypes = soundEffectTypes;
+    }
 }

@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface SoundEffectTypeRepository extends JpaRepository<SoundEffectType, Long> {
     List<SoundEffectType> findBySoundEffect(SoundEffect soundEffect);
-
 }
