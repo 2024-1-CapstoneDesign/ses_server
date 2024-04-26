@@ -8,6 +8,7 @@ import capstone.ses.dto.system.ResultCode;
 import capstone.ses.dto.system.Error;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import capstone.ses.service.SoundEffectService;
+import capstone.ses.service.SoundEffectTagService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class SoundEffectController {
 
     private final SoundEffectService soundEffectService;
     private final SoundEffectTypeRepository soundEffectTypeRepository;
+    private final SoundEffectTagService soundEffectTagService;
 
     @PostMapping("/test")
     public Result saveSoundEffect(MultipartFile multipartFile) {
@@ -130,6 +132,16 @@ public class SoundEffectController {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchSoundEffect(soundEffectId));
         } catch (EntityNotFoundException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "300");
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-003: 효과음 태그 조회
+    @GetMapping("/soundeffect/tag")
+    public Result searchSoundEffectTag() {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectTagService.getAll());
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }

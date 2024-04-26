@@ -1,6 +1,7 @@
 package capstone.ses.dto.soundeffect;
 
 import capstone.ses.domain.soundeffect.SoundEffectTag;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,5 +18,11 @@ public class SoundEffectTagDto {
                 .tagId(soundEffectTag.getId())
                 .tagName(soundEffectTag.getName())
                 .build();
+    }
+
+    @QueryProjection
+    public SoundEffectTagDto(Long tagId, String tagName) {
+        this.tagId = tagId;
+        this.tagName = tagName;
     }
 }
