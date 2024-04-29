@@ -8,7 +8,7 @@ public class YoutubeDownloadService {
 
     public byte[] getYoutudeAudio(String url, String startTime, String endTime) {
         // 파이썬 서버의 URL
-        String pythonServerUrl = "http://localhost:8000/download/?url=" + url
+        String pythonServerUrl = "http://soundeffect-search.p-e.kr:8000/download/?url=" + url
                 + "&start_time=" + startTime + "&end_time=" + endTime;
 
         // HTTP GET 요청을 보내서 오디오 파일을 받아옴
