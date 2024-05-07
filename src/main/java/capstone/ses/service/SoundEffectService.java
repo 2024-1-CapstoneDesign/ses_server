@@ -75,6 +75,8 @@ public class SoundEffectService {
             soundEffectDtos.add(SoundEffectDto.builder()
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
+                    .description(soundEffect.getDescription())
+                    .createBy(soundEffect.getDescription())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
                     .build());
