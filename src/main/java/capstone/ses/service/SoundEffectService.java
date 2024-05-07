@@ -2,7 +2,6 @@ package capstone.ses.service;
 
 import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
-import capstone.ses.domain.soundeffect.SoundEffectTag;
 import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
@@ -13,12 +12,13 @@ import capstone.ses.repository.SoundEffectSoundEffectTagRepository;
 import capstone.ses.repository.SoundEffectTagRepository;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,12 +59,28 @@ public class SoundEffectService {
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
+        //1. 조건에 맞춰 soundEffect 가져오기
         for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition)) {
+
+            //2. tag 가져오기
+            List<SoundEffectSoundEffectTagRel> bySoundEffect = soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect);
+
+            //2-1. 태그 IDS 추출
+            List<Long> soundEffectTagIds = bySoundEffect.stream()
+                    .map(soundEffectSoundEffectTagRel -> soundEffectSoundEffectTagRel.getSoundEffectTag().getId())
+                    .collect(Collectors.toList());
+
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
-            for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
-                soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
+            //2-2. 태그 ids 필터링
+            if (soundEffectTagIds.containsAll(soundEffectCondition.getSoundEffectTagIds() == null ? new ArrayList<>() : soundEffectCondition.getSoundEffectTagIds())) {
+                soundEffectTagDtos = bySoundEffect.stream()
+                        .map(soundEffectSoundEffectTagRel -> SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()))
+                        .collect(Collectors.toList());
+            } else {
+                continue;
             }
+
 
             List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
 
@@ -76,6 +92,7 @@ public class SoundEffectService {
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
                     .description(soundEffect.getDescription())
+                    .summary(soundEffect.getSummary())
                     .createBy(soundEffect.getDescription())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)

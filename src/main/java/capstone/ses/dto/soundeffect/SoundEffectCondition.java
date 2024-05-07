@@ -1,5 +1,7 @@
 package capstone.ses.dto.soundeffect;
 
+import jakarta.validation.constraints.Negative;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,4 +17,14 @@ public class SoundEffectCondition {
     private Integer bitDepth;
     private String channels;
     private List<Long> soundEffectTagIds;
+
+    @Builder
+    public SoundEffectCondition(Integer fromLength, Integer toLength, BigDecimal sampleRate, Integer bitDepth, String channels, List<Long> soundEffectTagIds) {
+        this.fromLength = fromLength;
+        this.toLength = toLength;
+        this.sampleRate = sampleRate;
+        this.bitDepth = bitDepth;
+        this.channels = channels;
+        this.soundEffectTagIds = soundEffectTagIds;
+    }
 }

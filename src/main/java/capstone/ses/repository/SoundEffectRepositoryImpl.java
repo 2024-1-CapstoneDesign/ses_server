@@ -31,7 +31,6 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
                                 .and(bitDepthEq(soundEffectCondition.getBitDepth()))
                                 .and(channelsEq(soundEffectCondition.getChannels()))
-
                 )
                 .fetch();
     }

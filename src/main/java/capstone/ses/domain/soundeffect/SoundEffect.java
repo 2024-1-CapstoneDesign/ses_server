@@ -17,11 +17,13 @@ public class SoundEffect extends BaseEntity {
     private Long id;
     private String name;
     private String description;
+    private String summary;
 
     @Builder
-    public SoundEffect(Long id, String name, String description) {
+    public SoundEffect(Long id, String name, String description, String summary) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.summary = summary;
     }
 }

@@ -13,6 +13,7 @@ public class SoundEffectDto {
     private Long soundEffectId;
     private String soundEffectName;
     private String description;
+    private String summary;
     private String createBy;
     private LocalDateTime createdAt;
     private List<SoundEffectTagDto> soundEffectTags;
@@ -23,6 +24,7 @@ public class SoundEffectDto {
             Long soundEffectId,
             String soundEffectName,
             String description,
+            String summary,
             String createBy,
             LocalDateTime createdAt,
             List<SoundEffectTagDto> soundEffectTags,
@@ -30,6 +32,7 @@ public class SoundEffectDto {
         this.soundEffectId = soundEffectId;
         this.soundEffectName = soundEffectName;
         this.description = description;
+        this.summary = summary;
         this.createBy = createBy;
         this.createdAt = createdAt;
         this.soundEffectTags = soundEffectTags;
