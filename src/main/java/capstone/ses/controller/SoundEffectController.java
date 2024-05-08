@@ -110,6 +110,7 @@ public class SoundEffectController {
             ) {
 
         try {
+
             List<SoundEffectDto> soundEffectDtos = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
                             .fromLength(fromLength)
                             .toLength(toLength)

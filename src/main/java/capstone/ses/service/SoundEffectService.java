@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,28 +58,13 @@ public class SoundEffectService {
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
-        //1. 조건에 맞춰 soundEffect 가져오기
         for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition)) {
-
-            //2. tag 가져오기
-            List<SoundEffectSoundEffectTagRel> bySoundEffect = soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect);
-
-            //2-1. 태그 IDS 추출
-            List<Long> soundEffectTagIds = bySoundEffect.stream()
-                    .map(soundEffectSoundEffectTagRel -> soundEffectSoundEffectTagRel.getSoundEffectTag().getId())
-                    .collect(Collectors.toList());
 
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
-            //2-2. 태그 ids 필터링
-            if (soundEffectTagIds.containsAll(soundEffectCondition.getSoundEffectTagIds() == null ? new ArrayList<>() : soundEffectCondition.getSoundEffectTagIds())) {
-                soundEffectTagDtos = bySoundEffect.stream()
-                        .map(soundEffectSoundEffectTagRel -> SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()))
-                        .collect(Collectors.toList());
-            } else {
-                continue;
+            for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
             }
-
 
             List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
 
