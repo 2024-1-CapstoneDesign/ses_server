@@ -2,7 +2,6 @@ package capstone.ses.service;
 
 import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
-import capstone.ses.domain.soundeffect.SoundEffectTag;
 import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
@@ -13,9 +12,9 @@ import capstone.ses.repository.SoundEffectSoundEffectTagRepository;
 import capstone.ses.repository.SoundEffectTagRepository;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +59,7 @@ public class SoundEffectService {
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
         for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition)) {
+
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
             for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
@@ -75,6 +75,10 @@ public class SoundEffectService {
             soundEffectDtos.add(SoundEffectDto.builder()
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
+                    .description(soundEffect.getDescription())
+                    .summary(soundEffect.getSummary())
+//                    .createBy(soundEffect.get)
+                    .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
                     .build());

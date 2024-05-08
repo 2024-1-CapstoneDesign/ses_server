@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -99,22 +100,25 @@ public class SoundEffectController {
     }
 
     @GetMapping("/soundeffect")
-    public Result searchSoundEffects(@ModelAttribute @Valid SoundEffectCondition soundEffectCondition, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<Error> errors = new ArrayList<>();
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                Error error = new Error(
-                        fieldError.getField(),
-                        fieldError.getRejectedValue() == null ? "" : fieldError.getRejectedValue().toString()
-                );
-                errors.add(error);
-
-                return new Result(ResultCode.FAIL, "400", errors);
-            }
-        }
+    public Result searchSoundEffects(
+            @RequestParam(required = false) Integer fromLength,
+            @RequestParam(required = false) Integer toLength,
+            @RequestParam(required = false) BigDecimal sampleRate,
+            @RequestParam(required = false) Integer bitDepth,
+            @RequestParam(required = false) String channels,
+            @RequestParam(required = false) List<Long> soundEffectTagId
+            ) {
 
         try {
-            List<SoundEffectDto> soundEffectDtos = soundEffectService.searchSoundEffects(soundEffectCondition);
+
+            List<SoundEffectDto> soundEffectDtos = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
+                            .fromLength(fromLength)
+                            .toLength(toLength)
+                            .sampleRate(sampleRate)
+                            .bitDepth(bitDepth)
+                            .channels(channels)
+                            .soundEffectTagIds(soundEffectTagId)
+                    .build());
 
             if (soundEffectDtos.isEmpty()) {
                 throw new EntityNotFoundException("조건에 해당하는 효과음이 존재하지 않습니다.");
