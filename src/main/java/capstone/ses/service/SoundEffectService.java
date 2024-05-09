@@ -7,10 +7,7 @@ import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
 import capstone.ses.dto.soundeffect.SoundEffectTagDto;
 import capstone.ses.dto.soundeffect.SoundEffectTypeDto;
-import capstone.ses.repository.SoundEffectRepository;
-import capstone.ses.repository.SoundEffectSoundEffectTagRepository;
-import capstone.ses.repository.SoundEffectTagRepository;
-import capstone.ses.repository.SoundEffectTypeRepository;
+import capstone.ses.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,7 @@ public class SoundEffectService {
     private final SoundEffectTagRepository soundEffectTagRepository;
     private final SoundEffectTypeRepository soundEffectTypeRepository;
     private final SoundEffectSoundEffectTagRepository soundEffectSoundEffectTagRepository;
+    private final SoundEffectTagQueryRepository soundEffectTagQueryRepository;
 
     public SoundEffectDto searchSoundEffect(Long soundEffectId) {
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exist soundeffect."));
@@ -59,6 +57,38 @@ public class SoundEffectService {
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
         for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition)) {
+
+            List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
+
+            for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
+            }
+
+            List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
+
+            for (SoundEffectType soundEffectType : soundEffectTypeRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
+            }
+
+            soundEffectDtos.add(SoundEffectDto.builder()
+                    .soundEffectId(soundEffect.getId())
+                    .soundEffectName(soundEffect.getName())
+                    .description(soundEffect.getDescription())
+                    .summary(soundEffect.getSummary())
+//                    .createBy(soundEffect.get)
+                    .createdAt(soundEffect.getCreatedDate())
+                    .soundEffectTags(soundEffectTagDtos)
+                    .soundEffectTypes(soundEffectTypeDtos)
+                    .build());
+        }
+
+        return soundEffectDtos;
+    }
+
+    public List<SoundEffectDto> searchRelativeSoundEffects(Long soundEffectId) {
+        List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
+
+        for (SoundEffect soundEffect : soundEffectRepository.searchRelativeSoundEffects(soundEffectTagQueryRepository.findAllBySoundEffectId(soundEffectId), soundEffectId)) {
 
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
