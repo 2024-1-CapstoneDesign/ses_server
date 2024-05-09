@@ -5,19 +5,15 @@ import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
-import capstone.ses.dto.system.Error;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import capstone.ses.service.SoundEffectService;
 import capstone.ses.service.SoundEffectTagService;
 import capstone.ses.service.YoutubeDownloadService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +23,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -167,5 +162,14 @@ public class SoundEffectController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @GetMapping("/soundeffect/{soundEffectId}/relative")
+    public Result searchSoundEffectRelative(@PathVariable Long soundEffectId) {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchRelativeSoundEffects(soundEffectId));
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
     }
 }

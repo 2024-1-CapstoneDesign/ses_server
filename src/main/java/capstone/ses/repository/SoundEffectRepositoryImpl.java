@@ -25,8 +25,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
     @Override
     public List<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition) {
         return queryFactory
-                .select(soundEffect)
-                .from(soundEffect)
+                .selectFrom(soundEffect)
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
                 .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
                 .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
@@ -41,6 +40,22 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 )
                 .fetch();
     }
+
+    @Override
+    public List<SoundEffect> searchRelativeSoundEffects(List<Long> soundEffectTagIds, Long soundEffectId) {
+        return queryFactory
+                .select(soundEffect)
+                .from(soundEffect)
+                .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                .where(soundEffectTag.id.in(soundEffectTagIds)
+                        .and(soundEffect.id.ne(soundEffectId)))
+                .groupBy(soundEffect.id)
+                .orderBy(soundEffectTag.id.count().desc())
+                .limit(3)
+                .fetch();
+    }
+
 
     private BooleanExpression fromLength(Integer fromLength) {
         return fromLength != null ? soundEffectType.length.goe(fromLength) : null;
@@ -67,10 +82,12 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 soundEffect.id.in(JPAExpressions.select(soundEffect.id)
                         .from(soundEffect)
                         .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
-                        .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                        .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                         .where(soundEffectTag.id.in(soundEffectTagIds))
                         .groupBy(soundEffect.id)
                         .having(soundEffect.id.count().intValue().eq(soundEffectTagIds.size())))
                 : null;
     }
+
+
 }

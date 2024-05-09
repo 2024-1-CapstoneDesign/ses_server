@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SoundEffectRepositoryCustom {
     List<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition);
+    List<SoundEffect> searchRelativeSoundEffects(List<Long> soundEffectTagIds, Long soundEffectId);
 }
