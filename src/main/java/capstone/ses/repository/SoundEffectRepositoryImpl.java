@@ -28,9 +28,9 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
     @Override
     public Page<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
         List<SoundEffect> soundEffects = queryFactory
-                .selectFrom(soundEffect)
+                .selectFrom(soundEffect).distinct()
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
-                .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
                 .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
