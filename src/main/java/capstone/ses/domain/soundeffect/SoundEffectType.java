@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 import static jakarta.persistence.FetchType.EAGER;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
@@ -19,23 +20,26 @@ public class SoundEffectType extends BaseEntity {
     @Column(name = "sound_effect_type_id")
     private Long id;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "sound_effect_id")
     private SoundEffect soundEffect;
 
     private String soundEffectTypeName;
     private Integer length;
-    @Lob
-    @Column(name = "soundEffectFile", columnDefinition = "MEDIUMBLOB")
-    private byte[] soundEffectFile;
-
     private String url;
 
     private BigDecimal sampleRate;
     private Integer bitDepth;
     private String channels;
+    private BigDecimal fileSize;
 
-    public void updateSoundEffectFile(byte[] soundEffectFile) {
-        this.soundEffectFile = soundEffectFile;
+    public void updateInfo(String soundEffectTypeName, Integer length, String url, BigDecimal sampleRate, Integer bitDepth, String channels, BigDecimal fileSize) {
+        this.soundEffectTypeName = soundEffectTypeName;
+        this.length = length;
+        this.url = url;
+        this.sampleRate = sampleRate;
+        this.bitDepth = bitDepth;
+        this.channels = channels;
+        this.fileSize = fileSize;
     }
 }

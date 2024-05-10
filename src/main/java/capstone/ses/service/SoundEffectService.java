@@ -3,10 +3,7 @@ package capstone.ses.service;
 import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
 import capstone.ses.domain.soundeffect.SoundEffectType;
-import capstone.ses.dto.soundeffect.SoundEffectCondition;
-import capstone.ses.dto.soundeffect.SoundEffectDto;
-import capstone.ses.dto.soundeffect.SoundEffectTagDto;
-import capstone.ses.dto.soundeffect.SoundEffectTypeDto;
+import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +43,7 @@ public class SoundEffectService {
                 .soundEffectId(soundEffect.getId())
                 .soundEffectName(soundEffect.getName())
                 .description(soundEffect.getDescription())
+                .summary(soundEffect.getSummary())
 //                .createBy(soundEffect.getCreatedBy())
                 .createdAt(soundEffect.getCreatedDate())
                 .soundEffectTags(soundEffectTagDtos)
@@ -116,5 +114,31 @@ public class SoundEffectService {
         }
 
         return soundEffectDtos;
+    }
+
+    @Transactional
+    public void updateSoundEffect(Long soundEffectId, SoundEffectForm soundEffectForm) {
+        SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundeffect"));
+        List<SoundEffectType> soundEffectTypes = soundEffectTypeRepository.findBySoundEffect(soundEffect);
+
+        if (soundEffectTypes.isEmpty()) {
+            throw new EntityNotFoundException("not exists soundeffect Type");
+        }
+
+        soundEffect.updateInfo(
+                soundEffectForm.getName(),
+                soundEffectForm.getDescription(),
+                soundEffectForm.getSummary()
+        );
+
+        soundEffectTypes.get(0).updateInfo(
+                soundEffectForm.getSoundEffectTypeName(),
+                soundEffectForm.getLength(),
+                soundEffectForm.getUrl(),
+                soundEffectForm.getSampleRate(),
+                soundEffectForm.getBitDepth(),
+                soundEffectForm.getChannels(),
+                soundEffectForm.getFileSize()
+        );
     }
 }
