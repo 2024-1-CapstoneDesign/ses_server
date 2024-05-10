@@ -12,6 +12,7 @@ import capstone.ses.service.YoutubeDownloadService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -94,6 +95,7 @@ public class SoundEffectController {
         }
     }
 
+    //soundeffect-001: 효과음 리스트 조회
     @GetMapping("/soundeffect")
     public Result searchSoundEffects(
             @RequestParam(required = false) Integer fromLength,
@@ -101,7 +103,8 @@ public class SoundEffectController {
             @RequestParam(required = false) BigDecimal sampleRate,
             @RequestParam(required = false) Integer bitDepth,
             @RequestParam(required = false) String channels,
-            @RequestParam(required = false) List<Long> soundEffectTagId
+            @RequestParam(required = false) List<Long> soundEffectTagId,
+            Pageable pageable
             ) {
 
         try {
@@ -113,7 +116,7 @@ public class SoundEffectController {
                             .bitDepth(bitDepth)
                             .channels(channels)
                             .soundEffectTagIds(soundEffectTagId)
-                    .build());
+                    .build(), pageable);
 
             if (soundEffectDtos.isEmpty()) {
                 throw new EntityNotFoundException("조건에 해당하는 효과음이 존재하지 않습니다.");
