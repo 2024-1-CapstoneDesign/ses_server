@@ -10,11 +10,14 @@ import capstone.ses.service.SoundEffectService;
 import capstone.ses.service.SoundEffectTagService;
 import capstone.ses.service.YoutubeDownloadService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Subgraph;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,63 +40,6 @@ public class SoundEffectController {
     private final SoundEffectTypeRepository soundEffectTypeRepository;
     private final SoundEffectTagService soundEffectTagService;
     private final YoutubeDownloadService youtubeDownloadService;
-
-    @PostMapping("/test")
-    public Result saveSoundEffect(MultipartFile multipartFile) {
-        try {
-            SoundEffectType testData = soundEffectTypeRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("해당 효과음이 존재하지 않습니다"));
-            Base64.Encoder encoder = Base64.getEncoder();
-            testData.updateSoundEffectFile(encoder.encode(multipartFile.getBytes()));
-            soundEffectTypeRepository.save(testData);
-
-            return new Result(ResultCode.SUCCESS, testData);
-        } catch (EntityNotFoundException e) {
-            return new Result(ResultCode.FAIL, e.getMessage(), "300");
-        } catch (IOException e) {
-            return new Result(ResultCode.FAIL, e.getMessage(), "400");
-        }
-    }
-
-    //TEST-002
-    @GetMapping("/test/download")
-    public Result testDownloadByS3() {
-        SoundEffectType testData = soundEffectTypeRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("해당 효과음이 존재하지 않습니다"));
-        return new Result(ResultCode.SUCCESS, testData.getUrl());
-    }
-
-    //TEST-001
-    @GetMapping("/test")
-    public ResponseEntity<byte[]> testSoundEffect() {
-        try {
-            SoundEffectType testData = soundEffectTypeRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("해당 효과음이 존재하지 않습니다"));
-
-            byte[] fileBytes = testData.getSoundEffectFile();
-
-            // base64 인코딩된 파일을 디코딩하여 byte 배열 반환
-            byte[] decodedBytes = Base64.getDecoder().decode(fileBytes);
-
-            // 파일을 저장할 임시 파일 생성
-            String fileName = "example.wav";
-            File tempFile;
-
-            try {
-                tempFile = File.createTempFile("temp", ".wav");
-                FileOutputStream fos = new FileOutputStream(tempFile);
-                fos.write(decodedBytes);
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return ResponseEntity
-                    .ok()
-                    .header("Content-Disposition", "attachment; filename=" + fileName)
-                    .body(decodedBytes);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
     //soundeffect-001: 효과음 리스트 조회
     @GetMapping("/soundeffect")
@@ -138,6 +84,14 @@ public class SoundEffectController {
             return new Result(ResultCode.FAIL, e.getMessage(), "300");
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-007: 효과음 수정
+    @PutMapping("/soundeffect/{soundEffectId}")
+    public Result updateSoundEffect(@PathVariable Long soundEffectId, @RequestBody @Valid ) {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.updateSoundEffect(soundEffectId));
         }
     }
 
