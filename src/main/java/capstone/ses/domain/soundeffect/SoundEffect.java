@@ -29,4 +29,10 @@ public class SoundEffect extends BaseEntity {
         this.description = description;
         this.summary = summary;
     }
+
+    public void updateInfo(String name, String description, String summary) {
+        this.name = name;
+        this.description = description;
+        this.summary = summary;
+    }
 }

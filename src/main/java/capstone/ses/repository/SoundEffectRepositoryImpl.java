@@ -6,6 +6,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -24,8 +26,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
-        return queryFactory
+    public Page<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
+        List<SoundEffect> soundEffects = queryFactory
                 .selectFrom(soundEffect)
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
                 .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
@@ -42,6 +44,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(soundEffects, pageable, soundEffects.size());
     }
 
     @Override
