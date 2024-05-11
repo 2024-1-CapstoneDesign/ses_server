@@ -3,6 +3,7 @@ package capstone.ses.controller;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import capstone.ses.dto.soundeffect.SoundEffectDto;
 import capstone.ses.dto.soundeffect.SoundEffectForm;
+import capstone.ses.dto.soundeffect.SoundEffectPaginationDto;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
 import capstone.ses.repository.SoundEffectTypeRepository;
@@ -47,7 +48,7 @@ public class SoundEffectController {
 
         try {
 
-            List<SoundEffectDto> soundEffectDtos = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
+            SoundEffectPaginationDto soundEffectPaginationDto = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
                     .fromLength(fromLength)
                     .toLength(toLength)
                     .sampleRate(sampleRate)
@@ -56,10 +57,7 @@ public class SoundEffectController {
                     .soundEffectTagIds(soundEffectTagId)
                     .build(), pageable);
 
-            if (soundEffectDtos.isEmpty()) {
-                throw new EntityNotFoundException("조건에 해당하는 효과음이 존재하지 않습니다.");
-            }
-            return new Result(ResultCode.SUCCESS, soundEffectDtos);
+            return new Result(ResultCode.SUCCESS, soundEffectPaginationDto);
         } catch (EntityNotFoundException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "300");
         } catch (IllegalStateException e) {

@@ -45,7 +45,23 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(soundEffects, pageable, soundEffects.size());
+        long totalCount = queryFactory
+                .selectFrom(soundEffect).distinct()
+                .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
+                .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                .where(
+                        soundEffect.id.isNotNull()
+                                .and(fromLength(soundEffectCondition.getFromLength()))
+                                .and(toLength(soundEffectCondition.getToLength()))
+                                .and(sampleRateEq(soundEffectCondition.getSampleRate()))
+                                .and(bitDepthEq(soundEffectCondition.getBitDepth()))
+                                .and(channelsEq(soundEffectCondition.getChannels()))
+                                .and(soundEffectTagEq(soundEffectCondition.getSoundEffectTagIds()))
+                )
+                .fetchCount();
+
+        return new PageImpl<>(soundEffects, pageable, totalCount);
     }
 
     @Override
