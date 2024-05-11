@@ -7,6 +7,7 @@ import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +52,12 @@ public class SoundEffectService {
                 .build();
     }
 
-    public List<SoundEffectDto> searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
+    public SoundEffectPaginationDto searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
+        Page<SoundEffect> soundEffects = soundEffectRepository.searchSoundEffects(soundEffectCondition, pageable);
 
-        for (SoundEffect soundEffect : soundEffectRepository.searchSoundEffects(soundEffectCondition, pageable)) {
+        for (SoundEffect soundEffect : soundEffects) {
 
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
@@ -81,7 +83,7 @@ public class SoundEffectService {
                     .build());
         }
 
-        return soundEffectDtos;
+        return new SoundEffectPaginationDto(soundEffectDtos, soundEffects.getTotalPages());
     }
 
     public List<SoundEffectDto> searchRelativeSoundEffects(Long soundEffectId) {
