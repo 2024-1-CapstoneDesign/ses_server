@@ -34,6 +34,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
+                                .and(soundEffect.id.loe(914L))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
@@ -52,6 +53,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
+                                .and(soundEffect.id.loe(914L))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
