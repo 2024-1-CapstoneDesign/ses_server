@@ -30,8 +30,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
         List<SoundEffect> soundEffects = queryFactory
                 .selectFrom(soundEffect).distinct()
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
-                .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
-                .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
                                 .and(fromLength(soundEffectCondition.getFromLength()))
@@ -48,8 +48,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
         long totalCount = queryFactory
                 .selectFrom(soundEffect).distinct()
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
-                .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
-                .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
                                 .and(fromLength(soundEffectCondition.getFromLength()))
