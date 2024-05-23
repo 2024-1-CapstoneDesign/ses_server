@@ -1,9 +1,6 @@
 package capstone.ses.controller;
 
-import capstone.ses.dto.soundeffect.SoundEffectCondition;
-import capstone.ses.dto.soundeffect.SoundEffectDto;
-import capstone.ses.dto.soundeffect.SoundEffectForm;
-import capstone.ses.dto.soundeffect.SoundEffectPaginationDto;
+import capstone.ses.dto.soundeffect.*;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
 import capstone.ses.repository.SoundEffectTypeRepository;
@@ -129,4 +126,27 @@ public class SoundEffectController {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
     }
+
+    @PostMapping("/soundeffect/tag")
+    public Result createTag(@RequestBody String tags) {
+        try {
+            soundEffectTagService.createSoundEffectTag(tags);
+            return new Result(ResultCode.SUCCESS, null);
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    @PostMapping("/soundeffect/tag/rel")
+    public Result createTagRel(@RequestBody List<TagRelDto> tagsRelDto) {
+        try {
+            soundEffectTagService.createSoundEffectTagRel(tagsRelDto);
+            return new Result(ResultCode.SUCCESS, null);
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
 }
+
+

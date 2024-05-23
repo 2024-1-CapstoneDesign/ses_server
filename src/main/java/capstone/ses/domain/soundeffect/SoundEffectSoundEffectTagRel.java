@@ -23,4 +23,9 @@ public class SoundEffectSoundEffectTagRel {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "sound_effect_tag_id")
     private SoundEffectTag soundEffectTag;
+
+    public SoundEffectSoundEffectTagRel(SoundEffect soundEffect, SoundEffectTag soundEffectTag) {
+        this.soundEffect = soundEffect;
+        this.soundEffectTag = soundEffectTag;
+    }
 }

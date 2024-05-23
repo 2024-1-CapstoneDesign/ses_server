@@ -15,4 +15,8 @@ public class SoundEffectTag extends BaseEntity {
     @Column(name = "sound_effect_tag_id")
     private Long id;
     private String name;
+
+    public SoundEffectTag(String name) {
+        this.name = name;
+    }
 }
