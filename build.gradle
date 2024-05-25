@@ -46,6 +46,12 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	// Apache Commons IO
+	implementation 'commons-io:commons-io:2.11.0' // 최신 버전으로 변경할 수 있습니다.
+
+	// JAVE (Java Audio Video Encoder) with all dependencies
+	implementation 'ws.schild:jave-all-deps:3.5.0'
 }
 
 

@@ -1,6 +1,7 @@
 package capstone.ses.repository;
 
 import capstone.ses.domain.soundeffect.SoundEffect;
+import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -30,16 +31,19 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
         List<SoundEffect> soundEffects = queryFactory
                 .selectFrom(soundEffect).distinct()
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
-                .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
-                .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
+                .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
+                .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
-                                .and(soundEffect.id.loe(914L))
+                                .and(soundEffect.id.loe(935L))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
                                 .and(bitDepthEq(soundEffectCondition.getBitDepth()))
                                 .and(channelsEq(soundEffectCondition.getChannels()))
+                                .and(fromFileSize(soundEffectCondition.getFromFileSize()))
+                                .and(toFileSize(soundEffectCondition.getToFileSize()))
+                                .and(typeEq(soundEffectCondition.getType()))
                                 .and(soundEffectTagEq(soundEffectCondition.getSoundEffectTagIds()))
                 )
                 .offset(pageable.getOffset())
@@ -53,12 +57,15 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
                         soundEffect.id.isNotNull()
-                                .and(soundEffect.id.loe(914L))
+                                .and(soundEffect.id.loe(935L))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
                                 .and(bitDepthEq(soundEffectCondition.getBitDepth()))
                                 .and(channelsEq(soundEffectCondition.getChannels()))
+                                .and(fromFileSize(soundEffectCondition.getFromFileSize()))
+                                .and(toFileSize(soundEffectCondition.getToFileSize()))
+                                .and(typeEq(soundEffectCondition.getType()))
                                 .and(soundEffectTagEq(soundEffectCondition.getSoundEffectTagIds()))
                 )
                 .fetchCount();
@@ -100,6 +107,18 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
 
     private BooleanExpression channelsEq(String channels) {
         return hasText(channels) ? (soundEffectType.channels.eq(channels)) : null;
+    }
+
+    private BooleanExpression fromFileSize(BigDecimal fromFileSize) {
+        return fromFileSize != null ? soundEffectType.fileSize.goe(fromFileSize) : null;
+    }
+
+    private BooleanExpression toFileSize(BigDecimal toFileSize) {
+        return toFileSize != null ? soundEffectType.fileSize.loe(toFileSize) : null;
+    }
+
+    private BooleanExpression typeEq(String type) {
+        return hasText(type) ? soundEffectType.soundEffectTypeName.eq(type) : null;
     }
 
     private BooleanExpression soundEffectTagEq(List<Long> soundEffectTagIds) {

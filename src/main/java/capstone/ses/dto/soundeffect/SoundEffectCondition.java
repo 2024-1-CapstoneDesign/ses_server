@@ -16,15 +16,31 @@ public class SoundEffectCondition {
     private BigDecimal sampleRate;
     private Integer bitDepth;
     private String channels;
+    private BigDecimal fromFileSize;
+    private BigDecimal toFileSize;
+    private String type;
     private List<Long> soundEffectTagIds;
 
     @Builder
-    public SoundEffectCondition(Integer fromLength, Integer toLength, BigDecimal sampleRate, Integer bitDepth, String channels, List<Long> soundEffectTagIds) {
+
+    public SoundEffectCondition(
+            Integer fromLength,
+            Integer toLength,
+            BigDecimal sampleRate,
+            Integer bitDepth,
+            String channels,
+            BigDecimal fromFileSize,
+            BigDecimal toFileSize,
+            String type,
+            List<Long> soundEffectTagIds) {
         this.fromLength = fromLength;
         this.toLength = toLength;
         this.sampleRate = sampleRate;
         this.bitDepth = bitDepth;
         this.channels = channels;
+        this.fromFileSize = fromFileSize;
+        this.toFileSize = toFileSize;
+        this.type = type;
         this.soundEffectTagIds = soundEffectTagIds;
     }
 }
