@@ -42,6 +42,9 @@ public class SoundEffectController {
             @RequestParam(required = false) BigDecimal sampleRate,
             @RequestParam(required = false) Integer bitDepth,
             @RequestParam(required = false) String channels,
+            @RequestParam(required = false) BigDecimal fromFileSize,
+            @RequestParam(required = false) BigDecimal toFileSize,
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) List<Long> soundEffectTagId,
             Pageable pageable
     ) {
@@ -54,6 +57,9 @@ public class SoundEffectController {
                     .sampleRate(sampleRate)
                     .bitDepth(bitDepth)
                     .channels(channels)
+                    .fromFileSize(fromFileSize)
+                    .toFileSize(toFileSize)
+                    .type(type)
                     .soundEffectTagIds(soundEffectTagId)
                     .build(), pageable);
 
