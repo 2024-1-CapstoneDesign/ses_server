@@ -119,7 +119,7 @@ public class SoundEffectController {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchByDirect(file));
         } catch (IOException | UnsupportedAudioFileException e) {
-            return new Result(ResultCode.FAIL, "fail to convert file to .mav", "400");
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }

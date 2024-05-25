@@ -7,12 +7,17 @@ import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.Encoder;
+import org.apache.commons.codec.EncoderException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -153,6 +158,8 @@ public class SoundEffectService {
     public String searchByDirect(MultipartFile file) throws IOException, UnsupportedAudioFileException {
         // 파일 확장자 확인
         String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        //python에서 변환하는게 더 나은듯...ㅠ
 
         // .wav로 변환이 필요한 경우
         if (!"wav".equalsIgnoreCase(originalExtension)) {
