@@ -7,11 +7,16 @@ import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,5 +147,43 @@ public class SoundEffectService {
                 soundEffectForm.getChannels(),
                 soundEffectForm.getFileSize()
         );
+    }
+
+    @Transactional
+    public String searchByDirect(MultipartFile file) throws IOException, UnsupportedAudioFileException {
+        // 파일 확장자 확인
+        String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        // .wav로 변환이 필요한 경우
+        if (!"wav".equalsIgnoreCase(originalExtension)) {
+            File convertedFile = convertToWav(file);
+            return convertedFile.getName();
+        }
+        return file.getOriginalFilename();
+    }
+
+    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
+        File tempFile = File.createTempFile("upload", ".tmp");
+        file.transferTo(tempFile);
+
+        File wavFile = new File(tempFile.getParent(), FilenameUtils.getBaseName(file.getOriginalFilename()) + ".wav");
+
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(tempFile);
+        AudioFormat baseFormat = audioInputStream.getFormat();
+        AudioFormat targetFormat = new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED,
+                baseFormat.getSampleRate(),
+                16,
+                baseFormat.getChannels(),
+                baseFormat.getChannels() * 2,
+                baseFormat.getSampleRate(),
+                false
+        );
+
+        AudioInputStream convertedAudioInputStream = AudioSystem.getAudioInputStream(targetFormat, audioInputStream);
+        AudioSystem.write(convertedAudioInputStream, AudioFileFormat.Type.WAVE, wavFile);
+
+        tempFile.delete();
+        return wavFile;
     }
 }

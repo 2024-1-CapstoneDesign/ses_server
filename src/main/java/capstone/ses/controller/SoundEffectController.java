@@ -16,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -101,6 +104,21 @@ public class SoundEffectController {
         }
     }
 
+    @PostMapping("/soundeffect/search")
+    public Result searchSoundEffectDirect(@ModelAttribute @Valid MultipartFile file) {
+        if (file.isEmpty()) {
+            return new Result(ResultCode.FAIL, "not found", "300");
+        }
+
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchByDirect(file));
+        } catch (IOException | UnsupportedAudioFileException e) {
+            return new Result(ResultCode.FAIL, "fail to convert file to .mav", "400");
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
     //SOUNDEFFECT-005: 효과음 유튜브 구간 검색
     @GetMapping("/soundeffect/youtube")
     public ResponseEntity<byte[]> searchSoundEffectByYouTude(
@@ -127,6 +145,7 @@ public class SoundEffectController {
         }
     }
 
+    //create tag
     @PostMapping("/soundeffect/tag")
     public Result createTag(@RequestBody String tags) {
         try {
@@ -137,6 +156,7 @@ public class SoundEffectController {
         }
     }
 
+    //create tag-rel
     @PostMapping("/soundeffect/tag/rel")
     public Result createTagRel(@RequestBody List<TagRelDto> tagsRelDto) {
         try {

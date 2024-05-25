@@ -5,7 +5,6 @@ import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
 import capstone.ses.domain.soundeffect.SoundEffectTag;
 import capstone.ses.dto.soundeffect.SoundEffectTagDto;
 import capstone.ses.dto.soundeffect.TagRelDto;
-import capstone.ses.dto.soundeffect.TagsRelDto;
 import capstone.ses.repository.SoundEffectRepository;
 import capstone.ses.repository.SoundEffectSoundEffectTagRelRepository;
 import capstone.ses.repository.SoundEffectTagQueryRepository;
