@@ -36,6 +36,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .where(
                         soundEffect.id.isNotNull()
                                 .and(soundEffect.id.loe(935L))
+                                .and(nameContains(soundEffectCondition.getName()))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
@@ -86,6 +87,10 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .orderBy(soundEffectTag.id.count().desc())
                 .limit(3)
                 .fetch();
+    }
+
+    private BooleanExpression nameContains(String soundEffecName) {
+        return hasText(soundEffecName) ? soundEffect.name.contains(soundEffecName) : null;
     }
 
 

@@ -45,6 +45,7 @@ public class SoundEffectController {
             @RequestParam(required = false) BigDecimal fromFileSize,
             @RequestParam(required = false) BigDecimal toFileSize,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) List<Long> soundEffectTagId,
             Pageable pageable
     ) {
@@ -60,6 +61,7 @@ public class SoundEffectController {
                     .fromFileSize(fromFileSize)
                     .toFileSize(toFileSize)
                     .type(type)
+                    .name(name)
                     .soundEffectTagIds(soundEffectTagId)
                     .build(), pageable);
 

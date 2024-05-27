@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class SoundEffectCondition {
+    private String name;
     private Integer fromLength;
     private Integer toLength;
     private BigDecimal sampleRate;
@@ -22,8 +23,8 @@ public class SoundEffectCondition {
     private List<Long> soundEffectTagIds;
 
     @Builder
-
     public SoundEffectCondition(
+            String name,
             Integer fromLength,
             Integer toLength,
             BigDecimal sampleRate,
@@ -33,6 +34,7 @@ public class SoundEffectCondition {
             BigDecimal toFileSize,
             String type,
             List<Long> soundEffectTagIds) {
+        this.name = name;
         this.fromLength = fromLength;
         this.toLength = toLength;
         this.sampleRate = sampleRate;
