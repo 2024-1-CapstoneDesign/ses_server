@@ -45,6 +45,7 @@ public class SoundEffectController {
             @RequestParam(required = false) BigDecimal fromFileSize,
             @RequestParam(required = false) BigDecimal toFileSize,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) List<Long> soundEffectTagId,
             Pageable pageable
     ) {
@@ -60,6 +61,7 @@ public class SoundEffectController {
                     .fromFileSize(fromFileSize)
                     .toFileSize(toFileSize)
                     .type(type)
+                    .name(name)
                     .soundEffectTagIds(soundEffectTagId)
                     .build(), pageable);
 
@@ -119,7 +121,7 @@ public class SoundEffectController {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchByDirect(file));
         } catch (IOException | UnsupportedAudioFileException e) {
-            return new Result(ResultCode.FAIL, "fail to convert file to .mav", "400");
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }

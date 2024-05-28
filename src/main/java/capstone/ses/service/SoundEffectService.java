@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -153,6 +154,8 @@ public class SoundEffectService {
     public String searchByDirect(MultipartFile file) throws IOException, UnsupportedAudioFileException {
         // 파일 확장자 확인
         String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+        //python에서 변환하는게 더 나은듯...ㅠ
 
         // .wav로 변환이 필요한 경우
         if (!"wav".equalsIgnoreCase(originalExtension)) {
