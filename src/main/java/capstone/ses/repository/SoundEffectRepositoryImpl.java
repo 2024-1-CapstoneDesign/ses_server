@@ -59,6 +59,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .where(
                         soundEffect.id.isNotNull()
                                 .and(soundEffect.id.loe(935L))
+                                .and(nameContains(soundEffectCondition.getName()))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
                                 .and(sampleRateEq(soundEffectCondition.getSampleRate()))
