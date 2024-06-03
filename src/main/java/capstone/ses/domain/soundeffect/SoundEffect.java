@@ -23,8 +23,7 @@ public class SoundEffect extends BaseEntity {
     private String summary;
 
     @Builder
-    public SoundEffect(Long id, String name, String description, String summary) {
-        this.id = id;
+    public SoundEffect(String name, String description, String summary) {
         this.name = name;
         this.description = description;
         this.summary = summary;

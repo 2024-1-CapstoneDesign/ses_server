@@ -1,7 +1,6 @@
 package capstone.ses.repository;
 
 import capstone.ses.domain.soundeffect.SoundEffect;
-import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
