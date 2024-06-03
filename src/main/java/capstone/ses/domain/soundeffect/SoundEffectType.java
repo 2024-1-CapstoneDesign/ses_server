@@ -3,6 +3,7 @@ package capstone.ses.domain.soundeffect;
 import capstone.ses.domain.system.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,6 +33,26 @@ public class SoundEffectType extends BaseEntity {
     private Integer bitDepth;
     private String channels;
     private BigDecimal fileSize;
+
+    @Builder
+    public SoundEffectType(
+            SoundEffect soundEffect,
+            String soundEffectTypeName,
+            Integer length,
+            String url,
+            BigDecimal sampleRate,
+            Integer bitDepth,
+            String channels,
+            BigDecimal fileSize) {
+        this.soundEffect = soundEffect;
+        this.soundEffectTypeName = soundEffectTypeName;
+        this.length = length;
+        this.url = url;
+        this.sampleRate = sampleRate;
+        this.bitDepth = bitDepth;
+        this.channels = channels;
+        this.fileSize = fileSize;
+    }
 
     public void updateInfo(String soundEffectTypeName, Integer length, String url, BigDecimal sampleRate, Integer bitDepth, String channels, BigDecimal fileSize) {
         this.soundEffectTypeName = soundEffectTypeName;
