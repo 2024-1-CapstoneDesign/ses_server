@@ -271,7 +271,7 @@ public class SoundEffectService {
                                 .soundEffectName(soundEffect.getName())
                                 .description(soundEffect.getDescription())
                                 .summary(soundEffect.getSummary())
-//                                .createdAt(soundEffect.getCreatedDate())
+                                .createdAt(soundEffect.getCreatedDate())
                                 .soundEffectTags(soundEffectTagDtos)
                                 .soundEffectTypes(soundEffectTypeDtos)
                                 .build()
