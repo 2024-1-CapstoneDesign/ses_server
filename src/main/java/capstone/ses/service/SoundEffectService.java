@@ -196,7 +196,7 @@ public class SoundEffectService {
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
             List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
 
-            SoundEffect soundEffectByName = soundEffectRepository.findByName((String) result.get("name"));
+            SoundEffect soundEffectByName = soundEffectRepository.findByName((String) result.get("sound_effect_type_name"));
             if (soundEffectByName == null) {
                 SoundEffect soundEffect = soundEffectRepository.save(
                         SoundEffect.builder()
@@ -301,6 +301,10 @@ public class SoundEffectService {
         }
 
         return soundEffectDtos;
+    }
+
+    public List<SoundEffectDto> searchLikedSoundEffect(String accessToken) {
+        return null;
     }
 
 //    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
