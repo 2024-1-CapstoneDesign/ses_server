@@ -10,4 +10,5 @@ import java.util.List;
 public interface SoundEffectRepositoryCustom {
     Page<SoundEffect> searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable);
     List<SoundEffect> searchRelativeSoundEffects(List<Long> soundEffectTagIds, Long soundEffectId);
+    List<SoundEffect> searchLikedSoundEffects(Long memberId);
 }

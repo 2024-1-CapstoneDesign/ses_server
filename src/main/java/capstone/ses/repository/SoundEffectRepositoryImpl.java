@@ -1,5 +1,6 @@
 package capstone.ses.repository;
 
+import capstone.ses.domain.soundeffect.QLikeSoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static capstone.ses.domain.soundeffect.QLikeSoundEffect.likeSoundEffect;
 import static capstone.ses.domain.soundeffect.QSoundEffect.soundEffect;
 import static capstone.ses.domain.soundeffect.QSoundEffectSoundEffectTagRel.soundEffectSoundEffectTagRel;
 import static capstone.ses.domain.soundeffect.QSoundEffectTag.soundEffectTag;
@@ -84,6 +86,15 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .groupBy(soundEffect.id)
                 .orderBy(soundEffectTag.id.count().desc())
                 .limit(3)
+                .fetch();
+    }
+
+    @Override
+    public List<SoundEffect> searchLikedSoundEffects(Long memberId) {
+        return queryFactory
+                .selectFrom(soundEffect)
+                .innerJoin(likeSoundEffect).on(likeSoundEffect.soundEffect.eq(soundEffect))
+                .where(likeSoundEffect.member.id.eq(memberId))
                 .fetch();
     }
 
