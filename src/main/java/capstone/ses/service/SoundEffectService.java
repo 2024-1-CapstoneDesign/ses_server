@@ -6,8 +6,10 @@ import capstone.ses.domain.soundeffect.SoundEffectTag;
 import capstone.ses.domain.soundeffect.SoundEffectType;
 import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -271,7 +273,7 @@ public class SoundEffectService {
                                 .soundEffectName(soundEffect.getName())
                                 .description(soundEffect.getDescription())
                                 .summary(soundEffect.getSummary())
-//                                .createdAt(soundEffect.getCreatedDate())
+                                .createdAt(soundEffect.getCreatedDate())
                                 .soundEffectTags(soundEffectTagDtos)
                                 .soundEffectTypes(soundEffectTypeDtos)
                                 .build()
@@ -306,9 +308,145 @@ public class SoundEffectService {
     }
 
     public List<SoundEffectDto> searchLikedSoundEffect(String accessToken) {
-        String url = "https://external-api.com/resource?param1=" + accessToken;
+        String url = "http://localhost:8000/accounts/member/?accessToken=" + accessToken;
+
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(url, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Long memberId;
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response);
+            memberId = jsonNode.get("member_id").asLong();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return null;
+    }
+
+    public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime) throws JsonProcessingException {
+        // 파이썬 서버의 URL
+        String pythonServerUrl = "http://localhost:8000/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
+
+        // HTTP GET 요청을 보내서 오디오 파일을 받아옴
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(pythonServerUrl, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS.mappedFeature());
+
+        List<Map<String, Object>> results = objectMapper.readValue(response, new TypeReference<List<Map<String, Object>>>() {});
+
+        List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
+
+        for (Map<String, Object> result : results) {
+            List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
+            List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
+
+            SoundEffect soundEffectByName = soundEffectRepository.findByName((String) result.get("sound_effect_type_name"));
+            if (soundEffectByName == null) {
+                SoundEffect soundEffect = soundEffectRepository.save(
+                        SoundEffect.builder()
+                                .name((String) result.get("sound_effect_type_name"))
+                                .description((String) result.get("description"))
+                                .summary((String) result.get("summary"))
+                                .build()
+                );
+
+                String name = (String) result.get("name");
+                String[] split = name.split("\\."); // 점(.)을 이스케이프하여 사용
+                String lastValue = split[split.length - 1];
+
+                String[] parts = ((String) result.get("length")).split(":");
+                int hours = Integer.parseInt(parts[0]);
+                int minutes = Integer.parseInt(parts[1]);
+                int seconds = Integer.parseInt(parts[2]);
+                int totalTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+                SoundEffectType soundEffectType = soundEffectTypeRepository.save(
+                        SoundEffectType.builder()
+                                .soundEffect(soundEffect)
+                                .soundEffectTypeName(lastValue)
+                                .length(totalTimeInSeconds)
+                                .url((String) result.get("gcs_url"))
+                                .sampleRate(new BigDecimal((Integer) result.get("sample_rate")))
+                                .bitDepth((Integer) result.get("bit_depth"))
+                                .channels((String) result.get("channels"))
+                                .fileSize(new BigDecimal((Double) result.get("file_size")))
+                                .build()
+                );
+
+                soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
+                List<String> tagNames = new ArrayList<>();
+
+                for (String s : ((String) result.get("tag")).split("\\s+|\\|")) {
+                    if (s.equals(" ") || s.isEmpty() || s.equals("|")) {
+                        continue;
+                    }
+                    tagNames.add(s);
+                }
+
+                for (String tagName : tagNames) {
+                    SoundEffectTag byName = soundEffectTagRepository.findByName(tagName);
+                    if (byName == null) {
+                        SoundEffectTag soundEffectTag = soundEffectTagRepository.save(
+                                new SoundEffectTag(tagName)
+                        );
+
+                        soundEffectSoundEffectTagRelRepository.save(
+                                new SoundEffectSoundEffectTagRel(soundEffect, soundEffectTag)
+                        );
+
+                        soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectTag));
+                    } else {
+                        if (soundEffectSoundEffectTagRelRepository.findBySoundEffectAndSoundEffectTag(soundEffect, byName) == null) {
+                            soundEffectSoundEffectTagRelRepository.save(
+                                    new SoundEffectSoundEffectTagRel(soundEffect, byName)
+                            );
+                        }
+                        soundEffectTagDtos.add(SoundEffectTagDto.of(byName));
+                    }
+                }
+
+                soundEffectDtos.add(
+                        SoundEffectDto.builder()
+                                .soundEffectId(soundEffect.getId())
+                                .soundEffectName(soundEffect.getName())
+                                .description(soundEffect.getDescription())
+                                .summary(soundEffect.getSummary())
+                                .createdAt(soundEffect.getCreatedDate())
+                                .soundEffectTags(soundEffectTagDtos)
+                                .soundEffectTypes(soundEffectTypeDtos)
+                                .build()
+                );
+
+            } else {
+
+                for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffectByName)) {
+                    soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
+                }
+
+
+                for (SoundEffectType soundEffectType : soundEffectTypeRepository.findBySoundEffect(soundEffectByName)) {
+                    soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
+                }
+
+                soundEffectDtos.add(SoundEffectDto.builder()
+                        .soundEffectId(soundEffectByName.getId())
+                        .soundEffectName(soundEffectByName.getName())
+                        .description(soundEffectByName.getDescription())
+                        .summary(soundEffectByName.getSummary())
+                        .createBy(memberRepository.findById(soundEffectByName.getCreatedBy()).get().getName())
+                        .createdAt(soundEffectByName.getCreatedDate())
+                        .soundEffectTags(soundEffectTagDtos)
+                        .soundEffectTypes(soundEffectTypeDtos)
+                        .build());
+            }
+
+        }
+
+        return soundEffectDtos;
     }
 
 //    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
