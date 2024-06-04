@@ -46,6 +46,8 @@ public class SoundEffectService {
     private RestTemplate restTemplate;
 
     private final SoundEffectSoundEffectTagRelRepository soundEffectSoundEffectTagRelRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     public SoundEffectDto searchSoundEffect(Long soundEffectId) {
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exist soundeffect."));
@@ -93,12 +95,14 @@ public class SoundEffectService {
                 soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
             }
 
+            System.out.println("createBy"+memberRepository.findById(soundEffect.getCreatedBy()).get().getName());
+
             soundEffectDtos.add(SoundEffectDto.builder()
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
-//                    .createBy(soundEffect.get)
+                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
@@ -130,7 +134,7 @@ public class SoundEffectService {
                     .soundEffectName(soundEffect.getName())
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
-//                    .createBy(soundEffect.get)
+                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
@@ -236,12 +240,10 @@ public class SoundEffectService {
                     if (s.equals(" ") || s.isEmpty() || s.equals("|")) {
                         continue;
                     }
-                    System.out.println("tag: " + s);
                     tagNames.add(s);
                 }
 
                 for (String tagName : tagNames) {
-                    System.out.println("tagName: "+ tagName);
                     SoundEffectTag byName = soundEffectTagRepository.findByName(tagName);
                     if (byName == null) {
                         SoundEffectTag soundEffectTag = soundEffectTagRepository.save(
@@ -291,7 +293,7 @@ public class SoundEffectService {
                         .soundEffectName(soundEffectByName.getName())
                         .description(soundEffectByName.getDescription())
                         .summary(soundEffectByName.getSummary())
-//                    .createBy(soundEffect.get)
+                        .createBy(memberRepository.findById(soundEffectByName.getCreatedBy()).get().getName())
                         .createdAt(soundEffectByName.getCreatedDate())
                         .soundEffectTags(soundEffectTagDtos)
                         .soundEffectTypes(soundEffectTypeDtos)
@@ -304,6 +306,8 @@ public class SoundEffectService {
     }
 
     public List<SoundEffectDto> searchLikedSoundEffect(String accessToken) {
+        String url = "https://external-api.com/resource?param1=" + accessToken;
+
         return null;
     }
 
