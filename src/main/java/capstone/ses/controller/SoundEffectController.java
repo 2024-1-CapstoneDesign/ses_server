@@ -154,9 +154,10 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-010: 좋아요 효과음 조회
     @GetMapping("/soundeffect/like")
-    public Result searchLikedSoundEffect(@RequestParam String accessToken) {
+    public Result searchLikedSoundEffect(@RequestHeader("Authorization") String accessToken) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffects(accessToken));
+            System.out.println("Access token: " + accessToken.replaceFirst("Bearer ", ""));
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffects(accessToken.replaceFirst("Bearer ", "")));
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         } catch (JsonProcessingException e) {
@@ -166,9 +167,11 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-011: 효과음 좋아요 update
     @PutMapping("/soundeffect/{soundEffectId}/like")
-    public Result updateLikedSoundEffect(@PathVariable Long soundEffectId, @RequestParam String accessToken) {
+    public Result updateLikedSoundEffect(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable Long soundEffectId) {
         try {
-           return new Result(ResultCode.SUCCESS, soundEffectService.updateLikedSoundEffect(soundEffectId, accessToken));
+           return new Result(ResultCode.SUCCESS, soundEffectService.updateLikedSoundEffect(soundEffectId, accessToken.replaceFirst("Bearer ", "")));
         } catch (JsonProcessingException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
@@ -176,9 +179,11 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-012: 효과음 좋아요 취소 update
     @PutMapping("/soundeffect/{soundEffectId}/unlike")
-    public Result updateUnlikedSoundEffect(@PathVariable Long soundEffectId, @RequestParam String accessToken) {
+    public Result updateUnlikedSoundEffect(
+            @RequestHeader("Authorization") String accessToken,
+            @PathVariable Long soundEffectId) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.updateUnlikedSoundEffect(soundEffectId, accessToken));
+            return new Result(ResultCode.SUCCESS, soundEffectService.updateUnlikedSoundEffect(soundEffectId, accessToken.replaceFirst("Bearer ", "")));
         } catch (JsonProcessingException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
