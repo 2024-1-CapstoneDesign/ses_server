@@ -129,16 +129,16 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-005: 효과음 유튜브 구간 검색
     @GetMapping("/soundeffect/youtube")
-    public ResponseEntity<byte[]> searchSoundEffectByYouTude(
+    public Result searchSoundEffectByYouTude(
             @RequestParam String url,
             @RequestParam String from,
             @RequestParam String to
     ) {
         try {
-            return new ResponseEntity<>(youtubeDownloadService.getYoutudeAudio(url, from, to), HttpStatus.OK);
+            return new Result(ResultCode.SUCCESS, soundEffectService.getYoutudeAudio(url, from, to));
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
 
     }
@@ -148,6 +148,16 @@ public class SoundEffectController {
     public Result searchSoundEffectRelative(@PathVariable Long soundEffectId) {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchRelativeSoundEffects(soundEffectId));
+        } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-010: 좋아요 효과음 조회
+    @GetMapping("/soundeffect/like")
+    public Result searchLikedSoundEffect(@RequestParam String accessToken) {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffect(accessToken));
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
