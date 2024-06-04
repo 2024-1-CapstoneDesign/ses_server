@@ -1,9 +1,7 @@
 package capstone.ses.service;
 
-import capstone.ses.domain.soundeffect.SoundEffect;
-import capstone.ses.domain.soundeffect.SoundEffectSoundEffectTagRel;
-import capstone.ses.domain.soundeffect.SoundEffectTag;
-import capstone.ses.domain.soundeffect.SoundEffectType;
+import capstone.ses.domain.member.Member;
+import capstone.ses.domain.soundeffect.*;
 import capstone.ses.dto.soundeffect.*;
 import capstone.ses.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,6 +41,7 @@ public class SoundEffectService {
     private final SoundEffectTypeRepository soundEffectTypeRepository;
     private final SoundEffectSoundEffectTagRepository soundEffectSoundEffectTagRepository;
     private final SoundEffectTagQueryRepository soundEffectTagQueryRepository;
+    private final LikeSoundEffectRepository likeSoundEffectRepository;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -307,24 +306,44 @@ public class SoundEffectService {
         return soundEffectDtos;
     }
 
-    public List<SoundEffectDto> searchLikedSoundEffect(String accessToken) {
-        String url = "http://localhost:8000/accounts/member/?accessToken=" + accessToken;
+    public List<SoundEffectDto> searchLikedSoundEffects(String accessToken) throws JsonProcessingException {
+        Long memberId = getMemberIdByAccessToken(accessToken);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(url, String.class);
+        List<SoundEffect> soundEffects = soundEffectRepository.searchLikedSoundEffects(memberId);
+        List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Long memberId;
-        try {
-            JsonNode jsonNode = objectMapper.readTree(response);
-            memberId = jsonNode.get("member_id").asLong();
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (SoundEffect soundEffect : soundEffects) {
+
+            List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
+
+            for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTagDtos.add(SoundEffectTagDto.of(soundEffectSoundEffectTagRel.getSoundEffectTag()));
+            }
+
+            List<SoundEffectTypeDto> soundEffectTypeDtos = new ArrayList<>();
+
+            for (SoundEffectType soundEffectType : soundEffectTypeRepository.findBySoundEffect(soundEffect)) {
+                soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
+            }
+
+            System.out.println("createBy"+memberRepository.findById(soundEffect.getCreatedBy()).get().getName());
+
+            soundEffectDtos.add(SoundEffectDto.builder()
+                    .soundEffectId(soundEffect.getId())
+                    .soundEffectName(soundEffect.getName())
+                    .description(soundEffect.getDescription())
+                    .summary(soundEffect.getSummary())
+                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
+                    .createdAt(soundEffect.getCreatedDate())
+                    .soundEffectTags(soundEffectTagDtos)
+                    .soundEffectTypes(soundEffectTypeDtos)
+                    .build());
         }
 
-        return null;
+        return soundEffectDtos;
     }
 
+    @Transactional
     public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime) throws JsonProcessingException {
         // 파이썬 서버의 URL
         String pythonServerUrl = "https://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
@@ -448,6 +467,43 @@ public class SoundEffectService {
 
         return soundEffectDtos;
     }
+
+    @Transactional
+    public Boolean updateLikedSoundEffect(Long soundEffectId, String accessToken) throws JsonProcessingException {
+        Member member = memberRepository.findById(getMemberIdByAccessToken(accessToken)).orElseThrow(() -> new EntityNotFoundException("not exists member"));
+        SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundEffect"));
+        LikeSoundEffect bySoundEffectAndMember = likeSoundEffectRepository.findBySoundEffectAndMember(soundEffect, member);
+        if (bySoundEffectAndMember == null) {
+            likeSoundEffectRepository.save(new LikeSoundEffect(soundEffect, member));
+        } else {
+            bySoundEffectAndMember.updateActive();
+        }
+        return true;
+    }
+
+    @Transactional
+    public Boolean updateUnlikedSoundEffect(Long soundEffectId, String accessToken) throws JsonProcessingException {
+        Member member = memberRepository.findById(getMemberIdByAccessToken(accessToken)).orElseThrow(() -> new EntityNotFoundException("not exists member"));
+        SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundEffect"));
+        LikeSoundEffect bySoundEffectAndMember = likeSoundEffectRepository.findBySoundEffectAndMember(soundEffect, member);
+        bySoundEffectAndMember.updateInactive();
+        return false;
+    }
+
+    private static Long getMemberIdByAccessToken(String accessToken) throws JsonProcessingException {
+        String url = "https://soundeffect-search.p-e.kr:8443/accounts/member/?accessToken=" + accessToken;
+
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(url, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode jsonNode = objectMapper.readTree(response);
+        Long memberId = jsonNode.get("member_id").asLong();
+        return memberId;
+    }
+
+
 
 //    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
 //        File tempFile = File.createTempFile("upload", ".tmp");

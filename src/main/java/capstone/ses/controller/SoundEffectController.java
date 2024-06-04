@@ -7,13 +7,12 @@ import capstone.ses.repository.SoundEffectTypeRepository;
 import capstone.ses.service.SoundEffectService;
 import capstone.ses.service.SoundEffectTagService;
 import capstone.ses.service.YoutubeDownloadService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -157,8 +156,30 @@ public class SoundEffectController {
     @GetMapping("/soundeffect/like")
     public Result searchLikedSoundEffect(@RequestParam String accessToken) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffect(accessToken));
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffects(accessToken));
         } catch (IllegalStateException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        } catch (JsonProcessingException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-011: 효과음 좋아요 update
+    @PutMapping("/soundeffect/{soundEffectId}/like")
+    public Result updateLikedSoundEffect(@PathVariable Long soundEffectId, @RequestParam String accessToken) {
+        try {
+           return new Result(ResultCode.SUCCESS, soundEffectService.updateLikedSoundEffect(soundEffectId, accessToken));
+        } catch (JsonProcessingException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        }
+    }
+
+    //SOUNDEFFECT-012: 효과음 좋아요 취소 update
+    @PutMapping("/soundeffect/{soundEffectId}/unlike")
+    public Result updateUnlikedSoundEffect(@PathVariable Long soundEffectId, @RequestParam String accessToken) {
+        try {
+            return new Result(ResultCode.SUCCESS, soundEffectService.updateUnlikedSoundEffect(soundEffectId, accessToken));
+        } catch (JsonProcessingException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }
     }
