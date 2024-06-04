@@ -327,7 +327,7 @@ public class SoundEffectService {
 
     public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime) throws JsonProcessingException {
         // 파이썬 서버의 URL
-        String pythonServerUrl = "httpa://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
+        String pythonServerUrl = "https://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
 
         // HTTP GET 요청을 보내서 오디오 파일을 받아옴
         RestTemplate restTemplate = new RestTemplate();
