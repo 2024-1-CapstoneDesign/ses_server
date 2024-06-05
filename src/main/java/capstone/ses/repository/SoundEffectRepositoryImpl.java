@@ -1,9 +1,9 @@
 package capstone.ses.repository;
 
-import capstone.ses.domain.soundeffect.QLikeSoundEffect;
 import capstone.ses.domain.soundeffect.SoundEffect;
 import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -87,6 +87,30 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .orderBy(soundEffectTag.id.count().desc())
                 .limit(3)
                 .fetch();
+    }
+
+    @Override
+    public Boolean checkLikedSoundEffecet(SoundEffect bysoundEffect, Long memberId) {
+        if (memberId == null) {
+            return false;
+        } else {
+            return queryFactory
+                    .select(
+                            new CaseBuilder()
+                                    .when(likeSoundEffect.isActive.isNull())
+                                    .then(false)
+                                    .when(likeSoundEffect.isActive.eq(false))
+                                    .then(false)
+                                    .when(likeSoundEffect.isActive.eq(true))
+                                    .then(true)
+                                    .otherwise(false)
+                    )
+                    .from(soundEffect)
+                    .leftJoin(likeSoundEffect).on(soundEffect.eq(likeSoundEffect.soundEffect).and(likeSoundEffect.member.id.eq(memberId)))
+                    .where(soundEffect.eq(bysoundEffect))
+                    .fetchOne();
+        }
+
     }
 
     @Override

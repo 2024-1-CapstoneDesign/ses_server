@@ -6,7 +6,6 @@ import capstone.ses.dto.system.ResultCode;
 import capstone.ses.repository.SoundEffectTypeRepository;
 import capstone.ses.service.SoundEffectService;
 import capstone.ses.service.SoundEffectTagService;
-import capstone.ses.service.YoutubeDownloadService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -31,11 +30,11 @@ public class SoundEffectController {
     private final SoundEffectService soundEffectService;
     private final SoundEffectTypeRepository soundEffectTypeRepository;
     private final SoundEffectTagService soundEffectTagService;
-    private final YoutubeDownloadService youtubeDownloadService;
 
     //SOUNDEFFECT-001: 효과음 리스트 조회
     @GetMapping("/soundeffect")
     public Result searchSoundEffects(
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
             @RequestParam(required = false) Integer fromLength,
             @RequestParam(required = false) Integer toLength,
             @RequestParam(required = false) BigDecimal sampleRate,
@@ -50,7 +49,6 @@ public class SoundEffectController {
     ) {
 
         try {
-
             SoundEffectPaginationDto soundEffectPaginationDto = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
                     .fromLength(fromLength)
                     .toLength(toLength)
@@ -62,13 +60,14 @@ public class SoundEffectController {
                     .type(type)
                     .name(name)
                     .soundEffectTagIds(soundEffectTagId)
-                    .build(), pageable);
-
+                    .build(), accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null, pageable);
             return new Result(ResultCode.SUCCESS, soundEffectPaginationDto);
         } catch (EntityNotFoundException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "300");
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        } catch (JsonProcessingException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "401");
         }
     }
 

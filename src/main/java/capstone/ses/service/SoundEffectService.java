@@ -41,14 +41,13 @@ public class SoundEffectService {
     private final SoundEffectTypeRepository soundEffectTypeRepository;
     private final SoundEffectSoundEffectTagRepository soundEffectSoundEffectTagRepository;
     private final SoundEffectTagQueryRepository soundEffectTagQueryRepository;
+    private final MemberRepository memberRepository;
     private final LikeSoundEffectRepository likeSoundEffectRepository;
 
     @Autowired
     private RestTemplate restTemplate;
 
     private final SoundEffectSoundEffectTagRelRepository soundEffectSoundEffectTagRelRepository;
-    @Autowired
-    private MemberRepository memberRepository;
 
     public SoundEffectDto searchSoundEffect(Long soundEffectId) {
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exist soundeffect."));
@@ -70,20 +69,21 @@ public class SoundEffectService {
                 .soundEffectName(soundEffect.getName())
                 .description(soundEffect.getDescription())
                 .summary(soundEffect.getSummary())
-//                .createBy(soundEffect.getCreatedBy())
+                .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                 .createdAt(soundEffect.getCreatedDate())
                 .soundEffectTags(soundEffectTagDtos)
                 .soundEffectTypes(soundEffectTypeDtos)
                 .build();
     }
 
-    public SoundEffectPaginationDto searchSoundEffects(SoundEffectCondition soundEffectCondition, Pageable pageable) {
+    public SoundEffectPaginationDto searchSoundEffects(SoundEffectCondition soundEffectCondition, String accessToken, Pageable pageable) throws JsonProcessingException {
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
+        Long memberId = accessToken != null ? getMemberIdByAccessToken(accessToken) : null;
+
         Page<SoundEffect> soundEffects = soundEffectRepository.searchSoundEffects(soundEffectCondition, pageable);
 
         for (SoundEffect soundEffect : soundEffects) {
-
             List<SoundEffectTagDto> soundEffectTagDtos = new ArrayList<>();
 
             for (SoundEffectSoundEffectTagRel soundEffectSoundEffectTagRel : soundEffectSoundEffectTagRepository.findBySoundEffect(soundEffect)) {
@@ -96,13 +96,12 @@ public class SoundEffectService {
                 soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
             }
 
-            System.out.println("createBy"+memberRepository.findById(soundEffect.getCreatedBy()).get().getName());
-
             soundEffectDtos.add(SoundEffectDto.builder()
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
+                    .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
                     .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
@@ -500,6 +499,7 @@ public class SoundEffectService {
 
         JsonNode jsonNode = objectMapper.readTree(response);
         Long memberId = jsonNode.get("member_id").asLong();
+
         return memberId;
     }
 
