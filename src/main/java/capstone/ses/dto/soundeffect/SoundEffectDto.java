@@ -14,6 +14,7 @@ public class SoundEffectDto {
     private String soundEffectName;
     private String description;
     private String summary;
+    private Boolean isLiked;
     private String createBy;
     private LocalDateTime createdAt;
     private List<SoundEffectTagDto> soundEffectTags;
@@ -25,6 +26,7 @@ public class SoundEffectDto {
             String soundEffectName,
             String description,
             String summary,
+            Boolean isLiked,
             String createBy,
             LocalDateTime createdAt,
             List<SoundEffectTagDto> soundEffectTags,
@@ -33,6 +35,7 @@ public class SoundEffectDto {
         this.soundEffectName = soundEffectName;
         this.description = description;
         this.summary = summary;
+        this.isLiked = isLiked;
         this.createBy = createBy;
         this.createdAt = createdAt;
         this.soundEffectTags = soundEffectTags;
