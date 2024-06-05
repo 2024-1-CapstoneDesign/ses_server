@@ -174,7 +174,11 @@ public class SoundEffectService {
 
     @Transactional
     public List<SoundEffectDto> searchByDirect(MultipartFile file, String accessToken) throws IOException, UnsupportedAudioFileException {
-        Long memberId = getMemberIdByAccessToken(accessToken);
+        Long memberId = null;
+
+        if (accessToken != null) {
+            memberId = getMemberIdByAccessToken(accessToken);
+        }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", new InputStreamResource(file.getInputStream()))
@@ -351,7 +355,11 @@ public class SoundEffectService {
 
     @Transactional
     public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime, String accessToken) throws JsonProcessingException {
-        Long memberId = getMemberIdByAccessToken(accessToken);
+        Long memberId = null;
+
+        if (accessToken != null) {
+            memberId = getMemberIdByAccessToken(accessToken);
+        }
         // 파이썬 서버의 URL
         String pythonServerUrl = "https://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
 
