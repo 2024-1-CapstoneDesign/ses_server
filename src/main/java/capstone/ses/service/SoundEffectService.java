@@ -112,7 +112,7 @@ public class SoundEffectService {
         return new SoundEffectPaginationDto(soundEffectDtos, soundEffects.getTotalPages());
     }
 
-    public List<SoundEffectDto> searchRelativeSoundEffects(Long soundEffectId,String accessToken) throws JsonProcessingException {
+    public List<SoundEffectDto> searchRelativeSoundEffects(Long soundEffectId, String accessToken) throws JsonProcessingException {
         Long memberId = accessToken != null ? getMemberIdByAccessToken(accessToken) : null;
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
@@ -173,7 +173,9 @@ public class SoundEffectService {
     }
 
     @Transactional
-    public List<SoundEffectDto> searchByDirect(MultipartFile file) throws IOException, UnsupportedAudioFileException {
+    public List<SoundEffectDto> searchByDirect(MultipartFile file, String accessToken) throws IOException, UnsupportedAudioFileException {
+        Long memberId = getMemberIdByAccessToken(accessToken);
+
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", new InputStreamResource(file.getInputStream()))
                 .header("Content-Disposition", "form-data; name=file; filename=" + file.getOriginalFilename());
@@ -194,7 +196,8 @@ public class SoundEffectService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS.mappedFeature());
 
-        List<Map<String, Object>> results = objectMapper.readValue(responseBody, new TypeReference<List<Map<String, Object>>>() {});
+        List<Map<String, Object>> results = objectMapper.readValue(responseBody, new TypeReference<List<Map<String, Object>>>() {
+        });
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
@@ -273,6 +276,7 @@ public class SoundEffectService {
                                 .soundEffectName(soundEffect.getName())
                                 .description(soundEffect.getDescription())
                                 .summary(soundEffect.getSummary())
+                                .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
                                 .createdAt(soundEffect.getCreatedDate())
                                 .soundEffectTags(soundEffectTagDtos)
                                 .soundEffectTypes(soundEffectTypeDtos)
@@ -296,6 +300,7 @@ public class SoundEffectService {
                         .description(soundEffectByName.getDescription())
                         .summary(soundEffectByName.getSummary())
                         .createBy(memberRepository.findById(soundEffectByName.getCreatedBy()).get().getName())
+                        .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffectByName, memberId))
                         .createdAt(soundEffectByName.getCreatedDate())
                         .soundEffectTags(soundEffectTagDtos)
                         .soundEffectTypes(soundEffectTypeDtos)
@@ -327,13 +332,13 @@ public class SoundEffectService {
                 soundEffectTypeDtos.add(SoundEffectTypeDto.of(soundEffectType));
             }
 
-            System.out.println("createBy"+memberRepository.findById(soundEffect.getCreatedBy()).get().getName());
 
             soundEffectDtos.add(SoundEffectDto.builder()
                     .soundEffectId(soundEffect.getId())
                     .soundEffectName(soundEffect.getName())
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
+                    .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
                     .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
@@ -345,7 +350,8 @@ public class SoundEffectService {
     }
 
     @Transactional
-    public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime) throws JsonProcessingException {
+    public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime, String accessToken) throws JsonProcessingException {
+        Long memberId = getMemberIdByAccessToken(accessToken);
         // 파이썬 서버의 URL
         String pythonServerUrl = "https://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
 
@@ -356,7 +362,8 @@ public class SoundEffectService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS.mappedFeature());
 
-        List<Map<String, Object>> results = objectMapper.readValue(response, new TypeReference<List<Map<String, Object>>>() {});
+        List<Map<String, Object>> results = objectMapper.readValue(response, new TypeReference<List<Map<String, Object>>>() {
+        });
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
@@ -435,6 +442,7 @@ public class SoundEffectService {
                                 .soundEffectName(soundEffect.getName())
                                 .description(soundEffect.getDescription())
                                 .summary(soundEffect.getSummary())
+                                .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
                                 .createdAt(soundEffect.getCreatedDate())
                                 .soundEffectTags(soundEffectTagDtos)
                                 .soundEffectTypes(soundEffectTypeDtos)
@@ -457,6 +465,7 @@ public class SoundEffectService {
                         .soundEffectName(soundEffectByName.getName())
                         .description(soundEffectByName.getDescription())
                         .summary(soundEffectByName.getSummary())
+                        .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffectByName, memberId))
                         .createBy(memberRepository.findById(soundEffectByName.getCreatedBy()).get().getName())
                         .createdAt(soundEffectByName.getCreatedDate())
                         .soundEffectTags(soundEffectTagDtos)
@@ -471,7 +480,9 @@ public class SoundEffectService {
 
     @Transactional
     public Boolean updateLikedSoundEffect(Long soundEffectId, String accessToken) throws JsonProcessingException {
-        Member member = memberRepository.findById(getMemberIdByAccessToken(accessToken)).orElseThrow(() -> new EntityNotFoundException("not exists member"));
+        Long memberId = getMemberIdByAccessToken(accessToken);
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("not exists member"));
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundEffect"));
         LikeSoundEffect bySoundEffectAndMember = likeSoundEffectRepository.findBySoundEffectAndMember(soundEffect, member);
         if (bySoundEffectAndMember == null) {
@@ -504,7 +515,6 @@ public class SoundEffectService {
 
         return memberId;
     }
-
 
 
 //    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {

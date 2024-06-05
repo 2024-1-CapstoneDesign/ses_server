@@ -111,13 +111,15 @@ public class SoundEffectController {
     }
 
     @PostMapping("/soundeffect/search")
-    public Result searchSoundEffectDirect(@ModelAttribute @Valid MultipartFile file) {
+    public Result searchSoundEffectDirect(
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
+            @ModelAttribute @Valid MultipartFile file) {
         if (file.isEmpty()) {
             return new Result(ResultCode.FAIL, "not found", "300");
         }
 
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.searchByDirect(file));
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchByDirect(file, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
         } catch (IOException | UnsupportedAudioFileException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         } catch (IllegalStateException e) {
@@ -128,12 +130,13 @@ public class SoundEffectController {
     //SOUNDEFFECT-005: 효과음 유튜브 구간 검색
     @GetMapping("/soundeffect/youtube")
     public Result searchSoundEffectByYouTude(
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
             @RequestParam String url,
             @RequestParam String from,
             @RequestParam String to
     ) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.getYoutudeAudio(url, from, to));
+            return new Result(ResultCode.SUCCESS, soundEffectService.getYoutudeAudio(url, from, to, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
@@ -160,8 +163,9 @@ public class SoundEffectController {
     @GetMapping("/soundeffect/like")
     public Result searchLikedSoundEffect(@RequestHeader("Authorization") String accessToken) {
         try {
-            System.out.println("Access token: " + accessToken.replaceFirst("Bearer ", ""));
             return new Result(ResultCode.SUCCESS, soundEffectService.searchLikedSoundEffects(accessToken.replaceFirst("Bearer ", "")));
+        } catch (EntityNotFoundException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "300");
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         } catch (JsonProcessingException e) {
