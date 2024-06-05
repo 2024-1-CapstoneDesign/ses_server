@@ -143,11 +143,16 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-009: 유사한 효과음 조회
     @GetMapping("/soundeffect/{soundEffectId}/relative")
-    public Result searchSoundEffectRelative(@PathVariable Long soundEffectId) {
+    public Result searchSoundEffectRelative(
+            @RequestHeader(value = "Authorization", required = false) String accessToken,
+            @PathVariable Long soundEffectId
+    ) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.searchRelativeSoundEffects(soundEffectId));
+            return new Result(ResultCode.SUCCESS, soundEffectService.searchRelativeSoundEffects(soundEffectId, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
         } catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
