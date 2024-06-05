@@ -118,7 +118,9 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
         return queryFactory
                 .selectFrom(soundEffect)
                 .innerJoin(likeSoundEffect).on(likeSoundEffect.soundEffect.eq(soundEffect))
-                .where(likeSoundEffect.member.id.eq(memberId))
+                .where(likeSoundEffect.member.id.eq(memberId)
+                        .and(likeSoundEffect.isActive.eq(true))
+                )
                 .fetch();
     }
 
