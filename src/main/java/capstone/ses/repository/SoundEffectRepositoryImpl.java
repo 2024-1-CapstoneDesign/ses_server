@@ -53,7 +53,7 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .fetch();
 
         Long count = queryFactory
-                .selectDistinct(soundEffect.count())
+                .select(soundEffect.countDistinct())
                 .from(soundEffect)
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
                 .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
