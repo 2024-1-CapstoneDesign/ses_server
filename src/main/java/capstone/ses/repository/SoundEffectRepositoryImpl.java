@@ -5,6 +5,7 @@ import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,8 +52,9 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long totalCount = queryFactory
-                .selectFrom(soundEffect).distinct()
+        Long count = queryFactory
+                .selectDistinct(soundEffect.count())
+                .from(soundEffect)
                 .innerJoin(soundEffectType).on(soundEffect.eq(soundEffectType.soundEffect))
                 .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
                 .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
@@ -68,10 +70,9 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                                 .and(toFileSize(soundEffectCondition.getToFileSize()))
                                 .and(typeEq(soundEffectCondition.getType()))
                                 .and(soundEffectTagEq(soundEffectCondition.getSoundEffectTagIds()))
-                )
-                .fetchCount();
+                ).fetchOne();
 
-        return new PageImpl<>(soundEffects, pageable, totalCount);
+        return new PageImpl<>(soundEffects, pageable, count);
     }
 
     @Override
