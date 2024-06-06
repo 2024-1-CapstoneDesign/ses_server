@@ -5,7 +5,6 @@ import capstone.ses.dto.soundeffect.SoundEffectCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .innerJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
                 .innerJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
-                                soundEffect.id.isNotNull()
+//                        soundEffect.id.isNotNull()
+                        soundEffect.id.loe(1095L)
                                 .and(nameContains(soundEffectCondition.getName()))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
@@ -59,7 +59,8 @@ public class SoundEffectRepositoryImpl implements SoundEffectRepositoryCustom {
                 .leftJoin(soundEffectSoundEffectTagRel).on(soundEffect.eq(soundEffectSoundEffectTagRel.soundEffect))
                 .leftJoin(soundEffectTag).on(soundEffectSoundEffectTagRel.soundEffectTag.eq(soundEffectTag))
                 .where(
-                        soundEffect.id.isNotNull()
+                        soundEffect.id.loe(1095L)
+//                        soundEffect.id.isNotNull()
                                 .and(nameContains(soundEffectCondition.getName()))
                                 .and(fromLength(soundEffectCondition.getFromLength()))
                                 .and(toLength(soundEffectCondition.getToLength()))
