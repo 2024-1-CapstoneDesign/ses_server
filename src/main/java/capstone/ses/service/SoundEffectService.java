@@ -511,17 +511,18 @@ public class SoundEffectService {
     }
 
     private static Long getMemberIdByAccessToken(String accessToken) throws JsonProcessingException {
-        String url = "https://soundeffect-search.p-e.kr:8443/accounts/member/?accessToken=" + accessToken;
+//        String url = "https://soundeffect-search.p-e.kr:8443/accounts/member/?accessToken=" + accessToken;
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//        String response = restTemplate.getForObject(url, String.class);
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        JsonNode jsonNode = objectMapper.readTree(response);
+//        Long memberId = jsonNode.get("member_id").asLong();
 
-        RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(url, String.class);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode jsonNode = objectMapper.readTree(response);
-        Long memberId = jsonNode.get("member_id").asLong();
-
-        return memberId;
+//        return memberId;
+        return 1L;
     }
 
 
