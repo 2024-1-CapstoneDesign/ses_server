@@ -42,6 +42,7 @@ public class SoundEffectService {
     private final SoundEffectTagQueryRepository soundEffectTagQueryRepository;
     private final MemberRepository memberRepository;
     private final LikeSoundEffectRepository likeSoundEffectRepository;
+    private final MemberService memberService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -78,7 +79,7 @@ public class SoundEffectService {
     public SoundEffectPaginationDto searchSoundEffects(SoundEffectCondition soundEffectCondition, String accessToken, Pageable pageable) throws JsonProcessingException {
 
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
-        Long memberId = accessToken != null ? getMemberIdByAccessToken(accessToken) : null;
+        Long memberId = accessToken != null ? memberService.findMemberByAccessToken(accessToken).getId() : null;
 
         Page<SoundEffect> soundEffects = soundEffectRepository.searchSoundEffects(soundEffectCondition, pageable);
 
@@ -112,7 +113,7 @@ public class SoundEffectService {
     }
 
     public List<SoundEffectDto> searchRelativeSoundEffects(Long soundEffectId, String accessToken) throws JsonProcessingException {
-        Long memberId = accessToken != null ? getMemberIdByAccessToken(accessToken) : null;
+        Long memberId = accessToken != null ? memberService.findMemberByAccessToken(accessToken).getId() : null;
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
 
         for (SoundEffect soundEffect : soundEffectRepository.searchRelativeSoundEffects(soundEffectTagQueryRepository.findAllBySoundEffectId(soundEffectId), soundEffectId)) {
@@ -176,7 +177,7 @@ public class SoundEffectService {
         Long memberId = null;
 
         if (accessToken != null) {
-            memberId = getMemberIdByAccessToken(accessToken);
+            memberId = memberService.findMemberByAccessToken(accessToken).getId();
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
@@ -316,7 +317,8 @@ public class SoundEffectService {
     }
 
     public List<SoundEffectDto> searchLikedSoundEffects(String accessToken) throws JsonProcessingException {
-        Long memberId = getMemberIdByAccessToken(accessToken);
+        Member member = memberService.findMemberByAccessToken(accessToken);
+        Long memberId = member.getId();
 
         List<SoundEffect> soundEffects = soundEffectRepository.searchLikedSoundEffects(memberId);
         List<SoundEffectDto> soundEffectDtos = new ArrayList<>();
@@ -357,7 +359,7 @@ public class SoundEffectService {
         Long memberId = null;
 
         if (accessToken != null) {
-            memberId = getMemberIdByAccessToken(accessToken);
+            memberId = memberService.findMemberByAccessToken(accessToken).getId();
         }
         // 파이썬 서버의 URL
         String pythonServerUrl = "https://soundeffect-search.p-e.kr:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
@@ -487,9 +489,7 @@ public class SoundEffectService {
 
     @Transactional
     public Boolean updateLikedSoundEffect(Long soundEffectId, String accessToken) throws JsonProcessingException {
-        Long memberId = getMemberIdByAccessToken(accessToken);
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("not exists member"));
+        Member member = memberService.findMemberByAccessToken(accessToken);
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundEffect"));
         LikeSoundEffect bySoundEffectAndMember = likeSoundEffectRepository.findBySoundEffectAndMember(soundEffect, member);
         if (bySoundEffectAndMember == null) {
@@ -502,26 +502,11 @@ public class SoundEffectService {
 
     @Transactional
     public Boolean updateUnlikedSoundEffect(Long soundEffectId, String accessToken) throws JsonProcessingException {
-        Member member = memberRepository.findById(getMemberIdByAccessToken(accessToken)).orElseThrow(() -> new EntityNotFoundException("not exists member"));
+        Member member = memberService.findMemberByAccessToken(accessToken);
         SoundEffect soundEffect = soundEffectRepository.findById(soundEffectId).orElseThrow(() -> new EntityNotFoundException("not exists soundEffect"));
         LikeSoundEffect bySoundEffectAndMember = likeSoundEffectRepository.findBySoundEffectAndMember(soundEffect, member);
         bySoundEffectAndMember.updateInactive();
         return false;
-    }
-
-    private static Long getMemberIdByAccessToken(String accessToken) throws JsonProcessingException {
-//        String url = "https://soundeffect-search.p-e.kr:8443/accounts/member/?accessToken=" + accessToken;
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//        String response = restTemplate.getForObject(url, String.class);
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//
-//        JsonNode jsonNode = objectMapper.readTree(response);
-//        Long memberId = jsonNode.get("member_id").asLong();
-
-//        return memberId;
-        return 1L;
     }
 
 
