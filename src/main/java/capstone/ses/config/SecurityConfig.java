@@ -24,7 +24,7 @@ public class SecurityConfig {
         return new RestTemplate();
     }
 
-    private final CorsConfig corsFilter;
+    private final CorsConfig corsConfig;
     private final JwtFilter jwtFilter;
 
     // 시큐리티 필터는 다른 어떤 필터보다 먼저 실행됨
@@ -32,7 +32,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((manager) -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 로그인 안함
-                .addFilter(corsFilter) // @CrossOrigin(인증 X), 시큐리티 필터에 등록 인증 (O)
+                .addFilter(corsConfig.corsFilter()) // @CrossOrigin(인증 X), 시큐리티 필터에 등록 인증 (O)
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 안함
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
