@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.filter.CorsFilter;
+
 
 @Configuration
 @EnableWebSecurity
@@ -24,7 +24,7 @@ public class SecurityConfig {
         return new RestTemplate();
     }
 
-    private final CorsFilter corsFilter;
+    private final CorsConfig corsFilter;
     private final JwtFilter jwtFilter;
 
     // 시큐리티 필터는 다른 어떤 필터보다 먼저 실행됨
