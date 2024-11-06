@@ -1,6 +1,5 @@
 package capstone.ses.controller;
 
-import capstone.ses.dto.jwt.AuthTokens;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
 import capstone.ses.service.AuthService;

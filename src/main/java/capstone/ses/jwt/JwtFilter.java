@@ -24,7 +24,6 @@ public class JwtFilter extends HttpFilter {
             "/api/health",
             "/api/v1/oauth/login",
             "/api/v1/soundeffect",
-            "/api/v1/soundeffect/**",
             "/api/v1/soundeffect/tag",
             "/api/v1/soundeffect/search",
             "/api/v1/soundeffect/youtube",
