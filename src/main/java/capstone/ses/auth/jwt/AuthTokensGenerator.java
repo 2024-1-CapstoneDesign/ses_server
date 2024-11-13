@@ -1,4 +1,4 @@
-package capstone.ses.jwt;
+package capstone.ses.auth.jwt;
 
 import capstone.ses.dto.jwt.AuthTokens;
 import lombok.RequiredArgsConstructor;

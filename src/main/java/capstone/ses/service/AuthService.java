@@ -2,11 +2,12 @@ package capstone.ses.service;
 
 import capstone.ses.domain.member.Member;
 import capstone.ses.dto.jwt.AuthTokens;
-import capstone.ses.jwt.AuthTokensGenerator;
-import capstone.ses.jwt.JwtTokenProvider;
+import capstone.ses.auth.jwt.AuthTokensGenerator;
+import capstone.ses.auth.jwt.JwtTokenProvider;
 import capstone.ses.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final RestTemplate restTemplate;
@@ -27,6 +29,7 @@ public class AuthService {
 
     public AuthTokens loginByAccessToken(String accessToken) {
         // 1. google accessToken으로 사용자 정보 받아오기
+        log.info("accessToken: " + accessToken);
         HttpHeaders authHeaders = new HttpHeaders();
         authHeaders.setBearerAuth(accessToken);
         HttpEntity<?> entity = new HttpEntity<>(authHeaders);
@@ -36,6 +39,8 @@ public class AuthService {
         String email = (String) userInfo.get("email");
         String picture = (String) userInfo.get("picture");
         String name = (String) userInfo.get("name");
+
+        log.info("email: " + email);
 
         Member member;
         // 1-1. 사용자 정보가 db에 없을 경우

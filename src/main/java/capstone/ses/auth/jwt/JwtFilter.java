@@ -1,4 +1,4 @@
-package capstone.ses.jwt;
+package capstone.ses.auth.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;

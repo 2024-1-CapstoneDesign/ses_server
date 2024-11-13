@@ -1,6 +1,6 @@
 package capstone.ses.config;
 
-import capstone.ses.jwt.JwtFilter;
+import capstone.ses.auth.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,8 @@ public class SecurityConfig {
     // 시큐리티 필터는 다른 어떤 필터보다 먼저 실행됨
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((manager) -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 로그인 안함
                 .addFilter(corsConfig.corsFilter()) // @CrossOrigin(인증 X), 시큐리티 필터에 등록 인증 (O)
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 안함
