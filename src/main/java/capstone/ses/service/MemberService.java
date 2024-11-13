@@ -1,7 +1,7 @@
 package capstone.ses.service;
 
 import capstone.ses.domain.member.Member;
-import capstone.ses.jwt.JwtTokenProvider;
+import capstone.ses.auth.jwt.JwtTokenProvider;
 import capstone.ses.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

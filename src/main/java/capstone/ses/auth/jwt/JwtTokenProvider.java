@@ -1,4 +1,4 @@
-package capstone.ses.jwt;
+package capstone.ses.auth.jwt;
 
 import capstone.ses.auth.PrincipalDetails;
 import capstone.ses.auth.PrincipalDetailsService;
