@@ -5,6 +5,8 @@ import capstone.ses.domain.member.Member;
 import capstone.ses.dto.auth.request.GoogleApiClient;
 import capstone.ses.dto.auth.request.GoogleInfoResponse;
 import capstone.ses.dto.jwt.AuthTokens;
+import capstone.ses.dto.member.LoginResponse;
+import capstone.ses.dto.member.MemberResponse;
 import capstone.ses.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class AuthService {
 
     private final GoogleApiClient googleApiClient;
 
-    public AuthTokens loginByAccessToken(String accessToken) {
+    public LoginResponse loginByAccessToken(String accessToken) {
         // 1. google accessToken으로 사용자 정보 받아오기
         log.info("accessToken: " + accessToken);
 
@@ -44,8 +46,7 @@ public class AuthService {
             member = memberRepository.findByEmail(email)
                     .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 유저가 존재하지 않습니다."));
         }
-
         // 2. 토큰 생성 후 리턴
-        return tokensGenerator.generate(member.getEmail());
+        return new LoginResponse(tokensGenerator.generate(member.getEmail()), MemberResponse.of(member));
     }
 }
