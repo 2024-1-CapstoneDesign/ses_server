@@ -26,6 +26,11 @@ public class SecurityConfig {
 
     private final CorsConfig corsConfig;
     private final JwtFilter jwtFilter;
+    private static final String[] AUTH_WHITE_LIST = {
+            "/api/v1/oauth/**",
+            "/api/v1/soundeffect/**",
+            "/api/health"
+    };
 
     // 시큐리티 필터는 다른 어떤 필터보다 먼저 실행됨
     @Bean
@@ -37,7 +42,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 안함
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/oauth/**", "/api/v1/soundeffect/**", "/api/health").permitAll()
+                        .requestMatchers(AUTH_WHITE_LIST).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

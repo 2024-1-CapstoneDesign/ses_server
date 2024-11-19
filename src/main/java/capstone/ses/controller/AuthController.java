@@ -17,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login")
-    public Result login(@RequestParam String accessToken) {
+    public Result login(@RequestParam(value="accessToken") String accessToken) {
         try {
             return new Result<>(ResultCode.SUCCESS, authService.loginByAccessToken(accessToken));
         } catch (Exception e) {
