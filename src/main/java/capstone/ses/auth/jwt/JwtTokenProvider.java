@@ -20,7 +20,7 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; 	//1일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24; 	//1일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
 
     private final PrincipalDetailsService principalDetailsService;
@@ -57,7 +57,7 @@ public class JwtTokenProvider {
         final Date now = new Date();
         final Claims claims = Jwts.claims()
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME ));
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME));
 
         claims.put("EMAIL", email);
 
