@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             final String token = getJwtFromRequest(request);
-            log.info("accessToken: " + token);
+//            log.info("accessToken: " + token);
             if (jwtTokenProvider.validateToken(token) == VALID_JWT) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

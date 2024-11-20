@@ -52,8 +52,11 @@ public class SoundEffectController {
     ) {
 
         try {
-            log.info("accessToken: " + accessToken);
-            log.info("accessToken(Bearer 제거 버전): " + accessToken.substring("Bearer ".length()));
+            if(!accessToken.isEmpty()){
+                log.info("accessToken: " + accessToken);
+                log.info("accessToken(Bearer 제거 버전): " + accessToken.substring("Bearer ".length()));
+            }
+
             SoundEffectPaginationDto soundEffectPaginationDto = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
                     .fromLength(fromLength)
                     .toLength(toLength)
