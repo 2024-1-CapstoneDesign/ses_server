@@ -1,6 +1,9 @@
 package capstone.ses.controller;
 
-import capstone.ses.dto.soundeffect.*;
+import capstone.ses.dto.soundeffect.SoundEffectCondition;
+import capstone.ses.dto.soundeffect.SoundEffectForm;
+import capstone.ses.dto.soundeffect.SoundEffectPaginationDto;
+import capstone.ses.dto.soundeffect.TagRelDto;
 import capstone.ses.dto.system.Result;
 import capstone.ses.dto.system.ResultCode;
 import capstone.ses.repository.SoundEffectTypeRepository;
@@ -49,6 +52,8 @@ public class SoundEffectController {
     ) {
 
         try {
+            log.info("accessToken: " + accessToken);
+            log.info("accessToken(Bearer 제거 버전): " + accessToken.substring("Bearer ".length()));
             SoundEffectPaginationDto soundEffectPaginationDto = soundEffectService.searchSoundEffects(SoundEffectCondition.builder()
                     .fromLength(fromLength)
                     .toLength(toLength)
@@ -179,7 +184,7 @@ public class SoundEffectController {
             @RequestHeader("Authorization") String accessToken,
             @PathVariable Long soundEffectId) {
         try {
-           return new Result(ResultCode.SUCCESS, soundEffectService.updateLikedSoundEffect(soundEffectId, accessToken.replaceFirst("Bearer ", "")));
+            return new Result(ResultCode.SUCCESS, soundEffectService.updateLikedSoundEffect(soundEffectId, accessToken.replaceFirst("Bearer ", "")));
         } catch (JsonProcessingException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
         }

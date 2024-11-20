@@ -25,12 +25,12 @@ public class AuthService {
 
     public LoginResponse loginByAccessToken(String accessToken) {
         // 1. google accessToken으로 사용자 정보 받아오기
-        log.info("accessToken: " + accessToken);
+//        log.info("accessToken: " + accessToken);
 
         GoogleInfoResponse googleInfoResponse = googleApiClient.googleInfo("Bearer " + accessToken);
         String email = googleInfoResponse.email();
 
-        log.info("email: " + email);
+//        log.info("email: " + email);
 
         Member member;
         // 1-1. 사용자 정보가 db에 없을 경우
