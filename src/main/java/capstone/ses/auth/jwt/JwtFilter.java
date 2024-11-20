@@ -1,12 +1,12 @@
 package capstone.ses.auth.jwt;
 
+import capstone.ses.auth.MemberAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -32,10 +32,10 @@ public class JwtFilter extends OncePerRequestFilter {
             final String token = getJwtFromRequest(request);
 //            log.info("accessToken: " + token);
             if (jwtTokenProvider.validateToken(token) == VALID_JWT) {
-                UsernamePasswordAuthenticationToken authentication = jwtTokenProvider.getAuthentication(token);
+                String email = jwtTokenProvider.getEmailFromAccessToken(token);
+                MemberAuthentication authentication = MemberAuthentication.createMemberAuthentication(email);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                authentication.getAuthorities().forEach(authority -> System.out.println(authority.getAuthority()));
             }
         } catch (Exception exception) {
             log.info(exception.getMessage());

@@ -49,4 +49,8 @@ public class AuthService {
         // 2. 토큰 생성 후 리턴
         return new LoginResponse(tokensGenerator.generate(member.getEmail()), MemberResponse.of(member));
     }
+
+    public AuthTokens issueTestToken() {
+        return tokensGenerator.generate("aulo0514@gmail.com");
+    }
 }
