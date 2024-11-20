@@ -52,7 +52,7 @@ public class SoundEffectController {
     ) {
 
         try {
-            if(!accessToken.isEmpty()){
+            if(accessToken != null){
                 log.info("accessToken: " + accessToken);
                 log.info("accessToken(Bearer 제거 버전): " + accessToken.substring("Bearer ".length()));
             }
