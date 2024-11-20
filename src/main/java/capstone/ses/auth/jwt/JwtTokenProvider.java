@@ -31,7 +31,6 @@ public class JwtTokenProvider {
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         String email = getEmailFromAccessToken(token);
-        log.info("getEmailFromAccessToken: " + email);
         PrincipalDetails principalDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(email);
 
         // 만약 권한이 한 가지로 고정이라면, 예를 들어 ROLE_USER
@@ -70,14 +69,9 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    public String getEmailFromAccessToken(String token) {
-        Claims claims = getBody(token);
-        return claims.get("EMAIL").toString();
-    }
-
     public JwtValidationType validateToken(String token) {
         try {
-            getBody(token);
+            final Claims claims = getBody(token);
             return JwtValidationType.VALID_JWT;
         } catch (MalformedJwtException ex) {
             return JwtValidationType.INVALID_JWT_TOKEN;
@@ -101,5 +95,10 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String getEmailFromAccessToken(String token) {
+        Claims claims = getBody(token);
+        return claims.get("EMAIL").toString();
     }
 }
