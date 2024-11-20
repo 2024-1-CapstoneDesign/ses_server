@@ -29,15 +29,6 @@ public class JwtTokenProvider {
     private String JWT_SECRET;
 
 
-    public UsernamePasswordAuthenticationToken getAuthentication(String token) {
-        String email = getEmailFromAccessToken(token);
-        PrincipalDetails principalDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(email);
-
-        // 만약 권한이 한 가지로 고정이라면, 예를 들어 ROLE_USER
-        return new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
-    }
-
-
     public String generateAccessToken(String email) {
         final Date now = new Date();
         final Claims claims = Jwts.claims()

@@ -38,16 +38,16 @@ public class SoundEffectController {
     @GetMapping("/soundeffect")
     public Result searchSoundEffects(
             @RequestHeader(value = "Authorization", required = false) String accessToken,
-            @RequestParam(required = false) Integer fromLength,
-            @RequestParam(required = false) Integer toLength,
-            @RequestParam(required = false) BigDecimal sampleRate,
-            @RequestParam(required = false) Integer bitDepth,
-            @RequestParam(required = false) String channels,
-            @RequestParam(required = false) BigDecimal fromFileSize,
-            @RequestParam(required = false) BigDecimal toFileSize,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) List<Long> soundEffectTagId,
+            @RequestParam(required = false, value = "fromLength") Integer fromLength,
+            @RequestParam(required = false, value = "toLength") Integer toLength,
+            @RequestParam(required = false, value = "sampleRate") BigDecimal sampleRate,
+            @RequestParam(required = false, value = "bitDepth") Integer bitDepth,
+            @RequestParam(required = false, value = "channels") String channels,
+            @RequestParam(required = false, value = "fromFileSize") BigDecimal fromFileSize,
+            @RequestParam(required = false, value = "toFileSize") BigDecimal toFileSize,
+            @RequestParam(required = false, value = "type") String type,
+            @RequestParam(required = false, value = "name") String name,
+            @RequestParam(required = false, value = "soundEffectTagId") List<Long> soundEffectTagId,
             Pageable pageable
     ) {
 

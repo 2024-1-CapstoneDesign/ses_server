@@ -16,8 +16,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public Member findMemberByAccessToken(String accessToken) {
-        return memberRepository.findByEmail(
-                jwtTokenProvider.getEmailFromAccessToken(accessToken.substring(7))).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return memberRepository.findByEmail(jwtTokenProvider.getEmailFromAccessToken(accessToken)).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
     }
 
 }
