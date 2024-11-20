@@ -31,6 +31,7 @@ public class JwtTokenProvider {
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         String email = getEmailFromAccessToken(token);
+        log.info("getEmailFromAccessToken: " + email);
         PrincipalDetails principalDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(email);
 
         // 만약 권한이 한 가지로 고정이라면, 예를 들어 ROLE_USER
