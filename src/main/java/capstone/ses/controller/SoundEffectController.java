@@ -81,7 +81,7 @@ public class SoundEffectController {
 
     //SOUNDEFFECT-002: 효과음 세부 조회
     @GetMapping("/soundeffect/{soundEffectId}")
-    public Result searchSoundEffect(@PathVariable Long soundEffectId) {
+    public Result searchSoundEffect(@PathVariable(value = "soundEffectId") Long soundEffectId) {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchSoundEffect(soundEffectId));
         } catch (EntityNotFoundException e) {

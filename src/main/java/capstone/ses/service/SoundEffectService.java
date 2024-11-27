@@ -69,7 +69,7 @@ public class SoundEffectService {
                 .soundEffectName(soundEffect.getName())
                 .description(soundEffect.getDescription())
                 .summary(soundEffect.getSummary())
-                .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
+//                .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                 .createdAt(soundEffect.getCreatedDate())
                 .soundEffectTags(soundEffectTagDtos)
                 .soundEffectTypes(soundEffectTypeDtos)
