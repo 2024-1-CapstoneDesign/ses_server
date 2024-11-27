@@ -344,7 +344,7 @@ public class SoundEffectService {
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
                     .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
-                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
+//                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
