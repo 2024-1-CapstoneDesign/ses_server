@@ -28,6 +28,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -509,6 +510,16 @@ public class SoundEffectService {
         return false;
     }
 
+    @Transactional
+    public byte[] createSoundEffect(SoundEffectRequest soundEffectRequest) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<SoundEffectRequest> requestEntity = new HttpEntity<>(soundEffectRequest, headers);
+        String base64Data = restTemplate.postForObject("https://aulo-audiogen-956521670074.asia-northeast3.run.app/generate", requestEntity, String.class);
+
+        return Base64.getDecoder().decode(base64Data);
+    }
 
 //    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
 //        File tempFile = File.createTempFile("upload", ".tmp");
