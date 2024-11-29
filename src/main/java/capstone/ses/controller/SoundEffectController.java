@@ -138,10 +138,12 @@ public class SoundEffectController {
             @RequestHeader(value = "Authorization", required = false) String accessToken,
             @RequestParam String url,
             @RequestParam String from,
-            @RequestParam String to
+            @RequestParam String to,
+            @RequestParam String poToken,
+            @RequestParam String visitorData
     ) {
         try {
-            return new Result(ResultCode.SUCCESS, soundEffectService.getYoutudeAudio(url, from, to, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
+            return new Result(ResultCode.SUCCESS, soundEffectService.getYoutudeAudio(url, from, to, poToken, visitorData, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new Result(ResultCode.FAIL, e.getMessage(), "400");
