@@ -155,7 +155,7 @@ public class SoundEffectController {
     @GetMapping("/soundeffect/{soundEffectId}/relative")
     public Result searchSoundEffectRelative(
             @RequestHeader(value = "Authorization", required = false) String accessToken,
-            @PathVariable Long soundEffectId
+            @PathVariable(value = "soundEffectId") Long soundEffectId
     ) {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.searchRelativeSoundEffects(soundEffectId, accessToken != null ? accessToken.replaceFirst("Bearer ", "") : null));
