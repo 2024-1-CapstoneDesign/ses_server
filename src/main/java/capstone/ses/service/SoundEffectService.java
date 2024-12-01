@@ -137,7 +137,7 @@ public class SoundEffectService {
                     .description(soundEffect.getDescription())
                     .summary(soundEffect.getSummary())
                     .isLiked(soundEffectRepository.checkLikedSoundEffecet(soundEffect, memberId))
-                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
+//                    .createBy(memberRepository.findById(soundEffect.getCreatedBy()).get().getName())
                     .createdAt(soundEffect.getCreatedDate())
                     .soundEffectTags(soundEffectTagDtos)
                     .soundEffectTypes(soundEffectTypeDtos)
@@ -356,14 +356,14 @@ public class SoundEffectService {
     }
 
     @Transactional
-    public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime, String accessToken) throws JsonProcessingException {
+    public List<SoundEffectDto> getYoutudeAudio(String url, String startTime, String endTime, String poToken, String visitorData, String accessToken) throws JsonProcessingException {
         Long memberId = null;
 
         if (accessToken != null) {
             memberId = memberService.findMemberByAccessToken(accessToken).getId();
         }
         // 파이썬 서버의 URL
-        String pythonServerUrl = "http://localhost:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime;
+        String pythonServerUrl = "http://localhost:8443/download/?url=" + url + "&from=" + startTime + "&to=" + endTime +"&poToken=" + poToken + "&visitorData=" + visitorData;
 
         // HTTP GET 요청을 보내서 오디오 파일을 받아옴
         RestTemplate restTemplate = new RestTemplate();
