@@ -118,9 +118,10 @@ public class SoundEffectController {
     @PostMapping("/soundeffect/search")
     public Result searchSoundEffectDirect(
             @RequestHeader(value = "Authorization", required = false) String accessToken,
-            @ModelAttribute @Valid MultipartFile file) {
+            @RequestParam("file") @Valid MultipartFile file) {
+
         if (file.isEmpty()) {
-            return new Result(ResultCode.FAIL, "not found", "300");
+            return new Result(ResultCode.FAIL, "file이 전송되지 않았습니다.", "300");
         }
 
         try {
