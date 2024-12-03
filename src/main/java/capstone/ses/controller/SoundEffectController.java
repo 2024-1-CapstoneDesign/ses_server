@@ -229,7 +229,10 @@ public class SoundEffectController {
     public Result createSoundEffect(@RequestBody SoundEffectRequest soundEffectRequest) {
         try {
             return new Result(ResultCode.SUCCESS, soundEffectService.createSoundEffect(soundEffectRequest));
-        } catch (IllegalStateException e) {
+        } catch (JsonProcessingException e) {
+            return new Result(ResultCode.FAIL, e.getMessage(), "501");
+        }
+        catch (IllegalStateException e) {
             return new Result(ResultCode.FAIL, e.getMessage(), "500");
         }
     }
