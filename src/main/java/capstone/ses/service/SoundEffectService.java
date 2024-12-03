@@ -28,7 +28,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -511,38 +510,62 @@ public class SoundEffectService {
     }
 
     @Transactional
-    public byte[] createSoundEffect(SoundEffectRequest soundEffectRequest) {
+    public SoundEffectCreateDto createSoundEffect(SoundEffectRequest soundEffectRequest) throws JsonProcessingException {
+        // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<SoundEffectRequest> requestEntity = new HttpEntity<>(soundEffectRequest, headers);
-        String base64Data = restTemplate.postForObject("https://aulo-audiogen-956521670074.asia-northeast3.run.app/generate", requestEntity, String.class);
+        // 요청 데이터 직렬화
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonRequest = objectMapper.writeValueAsString(soundEffectRequest);
 
-        return Base64.getDecoder().decode(base64Data);
+        HttpEntity<String> requestEntity = new HttpEntity<>(jsonRequest, headers);
+
+        // RestTemplate 호출
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "http://localhost:8001/generate",
+                requestEntity,
+                String.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new IllegalStateException("Failed to fetch data from /generate");
+        }
+
+        // JSON 파싱
+        String responseBody = response.getBody();
+        List<Map<String, Object>> results = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
+
+        // 첫 번째 result 가져오기
+        Map<String, Object> result = results.get(0);
+
+        return SoundEffectCreateDto.builder()
+                .file((String) results.get(0).get("base64"))
+                .soundEffectName((String) results.get(0).get("name"))
+                .soundEffectTypes(
+                        SoundEffectTypeDto.builder()
+                                .length(convertToSeconds((String) result.get("length")))
+                                .sampleRate(new BigDecimal(result.get("sample_rate").toString()))
+                                .bitDepth((Integer) result.get("bit_depth"))
+                                .channels((String) result.get("channels"))
+                                .fileSize(new BigDecimal(result.get("file_size").toString()))
+                                .build()
+                )
+                .build();
     }
 
-//    private File convertToWav(MultipartFile file) throws IOException, UnsupportedAudioFileException {
-//        File tempFile = File.createTempFile("upload", ".tmp");
-//        file.transferTo(tempFile);
-//
-//        File wavFile = new File(tempFile.getParent(), FilenameUtils.getBaseName(file.getOriginalFilename()) + ".wav");
-//
-//        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(tempFile);
-//        AudioFormat baseFormat = audioInputStream.getFormat();
-//        AudioFormat targetFormat = new AudioFormat(
-//                AudioFormat.Encoding.PCM_SIGNED,
-//                baseFormat.getSampleRate(),
-//                16,
-//                baseFormat.getChannels(),
-//                baseFormat.getChannels() * 2,
-//                baseFormat.getSampleRate(),
-//                false
-//        );
-//
-//        AudioInputStream convertedAudioInputStream = AudioSystem.getAudioInputStream(targetFormat, audioInputStream);
-//        AudioSystem.write(convertedAudioInputStream, AudioFileFormat.Type.WAVE, wavFile);
-//
-//        tempFile.delete();
-//        return wavFile;
-//    }
+
+    private static int convertToSeconds(String timeString) {
+        // 시간 형식이 "0:00:05"와 같은 형태라고 가정
+        String[] parts = timeString.split(":");
+
+        // 시, 분, 초를 분리
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = Integer.parseInt(parts[2]);
+
+        // 초로 변환
+        return hours * 3600 + minutes * 60 + seconds;
+    }
 }
